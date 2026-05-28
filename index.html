@@ -178,6 +178,14 @@
             }
         }
 
+        // === МАГИЯ ЗДЕСЬ: Читаем фото напрямую и переводим в текстовый код ===
+        const getBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]); // Отсекаем лишнее
+            reader.onerror = error => reject(error);
+        });
+
         async function publishNews() {
             const category = document.getElementById("publish-category").value;
             const title = document.getElementById("news-title").value;
@@ -199,10 +207,12 @@
             try {
                 let imageUrl = "";
                 
-                // ТЕПЕРЬ НОЛИК В КВАДРАТНЫХ СКОБКАХ ТОЧНО ЕСТЬ!
+                // === ТЕПЕРЬ МЫ ОТПРАВЛЯЕМ ФОТО КАК ЗАШИФРОВАННЫЙ ТЕКСТ ===
                 if (fileInput.files.length > 0) {
+                    let base64Image = await getBase64(fileInput.files); // Вызываем конвертер
+                    
                     let formData = new FormData();
-                    formData.append("image", fileInput.files);
+                    formData.append("image", base64Image); // Отправляем серверу готовую строку, которую он просит!
                     
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
                         method: "POST",
