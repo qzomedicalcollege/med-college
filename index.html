@@ -79,7 +79,7 @@
             <button onclick="checkLogin()">Войти</button>
         </div>
 
-        <!-- Прокачанная панель публикации -->
+        <!-- Панель публикации -->
         <div class="admin-panel" id="admin-panel">
             <h3 style="margin-top: 0; color: #333;">Редактор сайта</h3>
             
@@ -199,10 +199,10 @@
             try {
                 let imageUrl = "";
                 
-                // === ВОТ ЗДЕСЬ ИСПРАВЛЕНА ОШИБКА: ДОБАВЛЕНО  ===
+                // === НАКОНЕЦ-ТО ИСПРАВЛЕНО: ДОБАВЛЕН  ===
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
-                    formData.append("image", fileInput.files); 
+                    formData.append("image", fileInput.files); // Тот самый нолик!
                     
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
                         method: "POST",
