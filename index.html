@@ -326,7 +326,7 @@
     <script>
         /* 1. КОНФИГУРАЦИЯ БАЗЫ ДАННЫХ И API */
         const FIREBASE_DB_URL = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news.json";
-        const IMGBB_API_KEY = "e743803bf9be739f3ae6fc6cabda585f"; // Рабочий ключ для картинок
+        const IMGBB_API_KEY = "e743803bf9be739f3ae6fc6cabda585f"; // Ваш ключ ImgBB
 
         /* 2. МУЛЬТИЯЗЫЧНОСТЬ */
         const i18n = {
@@ -434,13 +434,13 @@
             if (adminPanel) adminPanel.classList.toggle('hidden', !isAdmin);
         }
 
-        // Загрузка и рендер новостей (ИСПРАВЛЕНО: добавлено предотвращение кэширования браузером)
+        // Загрузка и рендер новостей (Обход жесткого кэширования браузером)
         async function loadNews() {
             const container = document.getElementById('news-container');
             if (!container) return;
 
             try {
-                // ИСПРАВЛЕНИЕ #2: Штамп времени '?_=' + Date.now() и 'cache: no-store' обходят жесткое кэширование телефонов
+                // Штамп времени '?_=' + Date.now() обходит жесткое кэширование телефонов
                 const urlWithNoCache = FIREBASE_DB_URL + '?_=' + new Date().getTime();
                 const res = await fetch(urlWithNoCache, { cache: 'no-store' });
                 const data = await res.json();
@@ -483,7 +483,7 @@
             }
         }
 
-        // Публикация новости (ИСПРАВЛЕНО: указан индекс файла для ImgBB)
+        // Публикация новости 
         const addNewsForm = document.getElementById('add-news-form');
         if (addNewsForm) {
             addNewsForm.addEventListener('submit', async (e) => {
@@ -498,10 +498,11 @@
                     const fileInput = document.getElementById('news-image');
                     let imageUrl = '';
 
-                    // ИСПРАВЛЕНИЕ #1: Берем строго  (первый файл), а не весь список!
+                    // ИСПРАВЛЕНИЕ: Берем строго ПЕРВЫЙ файл из списка 
                     if (fileInput.files && fileInput.files.length > 0) {
                         btn.textContent = 'Загрузка картинки...';
                         const formData = new FormData();
+                        // Важный фикс: передаем конкретный файл (индекс 0), а не список
                         formData.append('image', fileInput.files);
 
                         const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
