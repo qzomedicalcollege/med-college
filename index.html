@@ -6,36 +6,48 @@
     <title>Кызылординский высший медицинский колледж</title>
     
     <script>
-        // ТВОЙ КЛЮЧ ДЛЯ КАРТИНОК IMGBB
+        // Твой ключ ImgBB
         const imgbbKey = "582a59fe4c572868e41343f804672210";
-        // Запасной сервер для хранения новостей (работает без блокировок)
-        const storageUrl = "https://kvm-news-default-rtdb.firebaseio.com/news.json";
+        // Прямая ссылка на твою базу данных Firebase (Firestore REST API)
+        const firestoreUrl = "https://firestore.googleapis.com/v1/projects/qzomedicalcollege/databases/(default)/documents/news";
 
-        // Функция загрузки новостей
+        // Загрузка новостей
         async function loadNews() {
             const newsContainer = document.getElementById('news-grid');
             newsContainer.innerHTML = ''; 
             
             try {
-                const response = await fetch(storageUrl);
+                const response = await fetch(firestoreUrl);
                 const data = await response.json();
                 
-                if (!data) {
+                if (!data.documents) {
                     newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Новостей пока нет.</p>';
                     return;
                 }
 
-                // Превращаем объект в массив и сортируем по времени (новые сверху)
-                const newsList = Object.keys(data).map(key => data[key]);
+                // Преобразуем сложные данные Firestore в удобный массив
+                let newsList = data.documents.map(doc => {
+                    const fields = doc.fields || {};
+                    return {
+                        title: fields.title?.stringValue || "Без заголовка",
+                        content: fields.content?.stringValue || "",
+                        imageUrl: fields.imageUrl?.stringValue || "",
+                        timestamp: parseInt(fields.timestamp?.integerValue || "0")
+                    };
+                });
+
+                // Сортируем: новые сверху
                 newsList.sort((a, b) => b.timestamp - a.timestamp);
 
                 newsList.forEach((item) => {
+                    // Если даты нет, пишем "Недавнее"
                     const date = item.timestamp ? new Date(item.timestamp).toLocaleDateString('ru-RU') : 'Недавнее';
                     const defaultImg = 'https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?w=500&q=80';
+                    const finalImg = item.imageUrl ? item.imageUrl : defaultImg;
                     
                     const newsHTML = `
                         <div class="news-item">
-                            <img src="${item.imageUrl || defaultImg}" alt="News" class="news-img">
+                            <img src="${finalImg}" alt="News" class="news-img">
                             <div class="news-content">
                                 <span class="news-date">${date}</span>
                                 <h3 style="font-size: 18px; color: #004d99; margin-bottom: 10px;">${item.title}</h3>
@@ -47,7 +59,7 @@
                 });
             } catch (error) {
                 console.error("Ошибка загрузки:", error);
-                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка обновления ленты новостей.</p>';
+                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка подключения к базе данных.</p>';
             }
         }
 
@@ -59,7 +71,6 @@
             const addNewsForm = document.getElementById('add-news-form');
             const logoutBtn = document.getElementById('logout-btn');
 
-            // Простая и надежная авторизация локально (без обращения к заблокированным серверам)
             let isAdmin = localStorage.getItem('isMedAdmin') === 'true';
             if (isAdmin) {
                 addNewsForm.style.display = 'block';
@@ -75,7 +86,6 @@
                 const email = document.getElementById('email').value;
                 const pass = document.getElementById('password').value;
                 
-                // Временный быстрый пароль для админки
                 if (email === "admin" && pass === "admin") {
                     alert("Успешный вход!");
                     localStorage.setItem('isMedAdmin', 'true');
@@ -83,7 +93,7 @@
                     adminBtn.style.display = 'none';
                     loginForm.style.display = 'none';
                 } else {
-                    alert("Неверный логин или пароль! (Попробуйте логин: admin, пароль: admin)");
+                    alert("Неверный логин или пароль!");
                 }
             });
 
@@ -92,7 +102,7 @@
                 location.reload();
             });
 
-            // ПУБЛИКАЦИЯ НА ПРЯМЫХ HTTP-ЗАПРОСАХ
+            // ПУБЛИКАЦИЯ
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -102,13 +112,13 @@
 
                 if (!title || !content) return alert("Заполните заголовок и текст!");
 
-                publishBtn.innerText = "Мгновенная публикация...";
+                publishBtn.innerText = "Публикация...";
                 publishBtn.disabled = true;
 
                 try {
                     let imageUrl = "";
 
-                    // 1. Грузим картинку на ImgBB
+                    // Загружаем картинку на ImgBB
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -121,28 +131,30 @@
                         if (data.success) imageUrl = data.data.url;
                     }
 
-                    // 2. Отправляем текст новости через стандартный POST запрос
-                    const newNewsItem = {
-                        title: title,
-                        content: content,
-                        imageUrl: imageUrl,
-                        timestamp: Date.now()
+                    // Формируем структуру данных для Firestore REST API
+                    const newDoc = {
+                        fields: {
+                            title: { stringValue: title },
+                            content: { stringValue: content },
+                            imageUrl: { stringValue: imageUrl },
+                            timestamp: { integerValue: Date.now().toString() }
+                        }
                     };
 
-                    await fetch(storageUrl, {
+                    // Отправляем в ТВОЮ базу
+                    await fetch(firestoreUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(newNewsItem)
+                        body: JSON.stringify(newDoc)
                     });
 
-                    alert("Новость успешно опубликована в сети!");
+                    alert("Новость успешно опубликована!");
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
                     fileInput.value = '';
                     loadNews(); 
                 } catch (error) {
-                    alert("Ошибка при публикации: " + error.message);
-                    console.error(error);
+                    alert("Ошибка публикации: " + error.message);
                 } finally {
                     publishBtn.innerText = "Опубликовать";
                     publishBtn.disabled = false;
