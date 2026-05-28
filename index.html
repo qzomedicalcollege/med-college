@@ -8,7 +8,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { initializeFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
         // ТВОЙ КЛЮЧ ДЛЯ КАРТИНОК IMGBB
         const imgbbKey = "582a59fe4c572868e41343f804672210";
@@ -25,7 +25,11 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        
+        // ВАЖНО: Включаем обычный HTTP протокол вместо WebSocket
+        const db = initializeFirestore(app, {
+            experimentalForceLongPolling: true
+        });
 
         // Функция загрузки новостей
         async function loadNews() {
@@ -100,7 +104,7 @@
                 }
             });
 
-            // ПУБЛИКАЦИЯ С КАРТИНКОЙ ЧЕРЕЗ IMGBB
+            // ПУБЛИКАЦИЯ
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -117,7 +121,7 @@
                 try {
                     let imageUrl = "";
 
-                    // Загружаем картинку на ImgBB
+                    // Загружаем картинку на ImgBB, если файл выбран
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -130,13 +134,13 @@
                         const data = await response.json();
                         
                         if (data.success) {
-                            imageUrl = data.data.url; // Получаем прямую ссылку на фото
+                            imageUrl = data.data.url;
                         } else {
                             throw new Error("Ошибка загрузки картинки на сервер ImgBB");
                         }
                     }
 
-                    // Сохраняем текст и ссылку на картинку в базу данных Firebase
+                    // Сохраняем текст и ссылку на картинку в Firebase
                     await addDoc(collection(db, "news"), {
                         title: title,
                         content: content,
@@ -148,7 +152,7 @@
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
                     fileInput.value = '';
-                    loadNews(); // Обновляем ленту
+                    loadNews(); 
                 } catch (error) {
                     alert("Ошибка публикации: " + error.message);
                     console.error(error);
