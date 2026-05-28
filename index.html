@@ -14,15 +14,8 @@
         .lang-other { color: #666; }
 
         /* Шапка сайта с логотипом */
-        header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 20px; 
-            padding: 20px; 
-            background-color: #ffffff; 
-        }
-        header img { height: 80px; } /* Размер логотипа */
+        header { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; background-color: #ffffff; }
+        header img { height: 80px; }
         header h1 { color: #0056b3; margin: 0; font-size: 26px; }
         
         /* Навигация */
@@ -38,11 +31,13 @@
         /* Подвал */
         footer { background-color: #333; color: white; text-align: center; padding: 20px; margin-top: 20px; line-height: 1.6; }
         
-        /* Админка */
+        /* Админка и Кнопка удаления */
         .admin-panel { display: none; background: #e9ecef; padding: 20px; margin-top: 20px; border-radius: 5px; }
         input, textarea, select, button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
         button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
         button:hover { background-color: #218838; }
+        .delete-btn { display: none; background-color: #dc3545; width: auto; padding: 5px 15px; margin-top: 10px; font-size: 12px; }
+        .delete-btn:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
@@ -60,7 +55,7 @@
         <h1>Қызылорда жоғары медициналық колледжі</h1>
     </header>
 
-    <!-- Новое главное меню -->
+    <!-- Главное меню -->
     <nav>
         <a href="index.html" class="college-btn">Басты бет</a>
         <a href="about.html" class="college-btn">Колледж Туралы</a>
@@ -119,8 +114,8 @@
     <script>
         const baseUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/";
         const imgbbKey = "582a59fe4c572868e41343f804672210";
+        let isAdmin = false;
 
-        // Загружаем только новости на главной странице
         async function loadNews() {
             const container = document.getElementById("news-container");
             try {
@@ -134,17 +129,21 @@
                     return;
                 }
 
-                let newsArray = Object.values(data).reverse();
+                let entries = Object.entries(data).reverse();
                 
-                newsArray.forEach(news => {
+                entries.forEach(([key, news]) => {
                     let div = document.createElement("div");
                     div.className = "news-item";
                     let imgHtml = news.image ? `<img src="${news.image}" alt="Фото">` : "";
+                    
+                    let deleteBtnHtml = `<button class="delete-btn" onclick="deletePost('news', '${key}')" ${isAdmin ? 'style="display:block;"' : ''}>Удалить запись</button>`;
+
                     div.innerHTML = `
                         <h3 style="margin-bottom: 5px;">${news.title}</h3>
                         <small style="color: #888; display: block; margin-bottom: 10px;">${news.date}</small>
                         <p style="line-height: 1.5; white-space: pre-wrap;">${news.text}</p>
                         ${imgHtml}
+                        ${deleteBtnHtml}
                     `;
                     container.appendChild(div);
                 });
@@ -153,7 +152,13 @@
             }
         }
 
-        // Проверка логина (admin/admin)
+        async function deletePost(category, id) {
+            if(confirm("Вы уверены, что хотите безвозвратно удалить эту публикацию?")) {
+                await fetch(baseUrl + category + "/" + id + ".json", { method: "DELETE" });
+                loadNews(); 
+            }
+        }
+
         document.getElementById("show-login-btn").onclick = () => {
             document.getElementById("login-panel").style.display = "block";
         };
@@ -163,15 +168,16 @@
             let pass = document.getElementById("admin-password").value;
             
             if (login === "admin" && pass === "admin") {
+                isAdmin = true;
                 document.getElementById("login-panel").style.display = "none";
                 document.getElementById("show-login-btn").style.display = "none";
                 document.getElementById("admin-panel").style.display = "block";
+                document.querySelectorAll('.delete-btn').forEach(btn => btn.style.display = 'block');
             } else {
                 alert("Неверный логин или пароль!");
             }
         }
 
-        // Универсальная функция публикации
         async function publishNews() {
             const category = document.getElementById("publish-category").value;
             const title = document.getElementById("news-title").value;
@@ -193,7 +199,7 @@
             try {
                 let imageUrl = "";
                 
-                // Загрузка фото на ImgBB
+                // ИСПРАВЛЕННАЯ ОШИБКА ЗДЕСЬ: fileInput.files
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
                     formData.append("image", fileInput.files);
@@ -207,11 +213,10 @@
                     if (imgResult.success) {
                         imageUrl = imgResult.data.url;
                     } else {
-                        throw new Error("Ошибка загрузки картинки на сервер");
+                        throw new Error("Ошибка загрузки картинки на сервер. Убедитесь, что это фото.");
                     }
                 }
 
-                // Формируем данные
                 let newPost = {
                     title: title,
                     text: text,
@@ -219,7 +224,6 @@
                     date: new Date().toLocaleString("ru-RU")
                 };
 
-                // Отправляем в выбранную категорию базы данных
                 let dbResponse = await fetch(baseUrl + category + ".json", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -233,12 +237,10 @@
                 status.style.color = "green";
                 status.innerText = "Сәтті жарияланды! (Успешно опубликовано)";
                 
-                // Очищаем форму
                 document.getElementById("news-title").value = "";
                 document.getElementById("news-text").value = "";
                 fileInput.value = "";
                 
-                // Если публиковали новость - сразу обновляем ленту
                 if(category === "news") {
                     loadNews();
                 }
@@ -252,7 +254,6 @@
             btn.disabled = false;
         }
 
-        // Загружаем новости при открытии сайта
         loadNews();
     </script>
 </body>
