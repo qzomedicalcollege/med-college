@@ -1,15 +1,11 @@
-Замени содержимое своего admin.html на этот современный код. Я добавил красивый дизайн входа в светлых тонах с синими акцентами.
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Панель управления | ВМК</title>
-    <!-- Подключение шрифта Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        /* Базовые стили и переменные (Минимализм, синие акценты) */
         :root {
             --primary-color: #0056b3;
             --primary-hover: #004494;
@@ -18,17 +14,12 @@
             --text-main: #333333;
             --text-muted: #6c757d;
             --danger: #e53e3e;
-            --success: #38a169;
             --border-radius: 12px;
             --shadow: 0 10px 30px rgba(0, 86, 179, 0.08);
             --transition: all 0.3s ease;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -43,146 +34,74 @@
 
         .hidden { display: none !important; }
 
-        /* Контейнер панели */
         .admin-container {
             width: 100%;
             max-width: 800px;
             background: var(--card-bg);
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
-            overflow: hidden;
             padding: 40px;
-            transition: var(--transition);
         }
 
-        h2, h3 {
-            color: var(--primary-color);
-            margin-bottom: 25px;
-            font-weight: 700;
-        }
+        h2, h3 { color: var(--primary-color); margin-bottom: 25px; font-weight: 700; }
 
-        /* Формы */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            font-size: 14px;
-            color: var(--text-main);
-        }
-
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; }
+        
         input, textarea {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            transition: var(--transition);
+            width: 100%; padding: 14px; border: 1px solid #d1d5db;
+            border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 15px;
         }
+        input:focus, textarea:focus { outline: none; border-color: var(--primary-color); }
 
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
-        }
-
-        /* Кнопки */
         .btn {
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 14px 24px;
-            background-color: var(--primary-color);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
+            width: 100%; padding: 14px 24px; background-color: var(--primary-color);
+            color: #fff; border: none; border-radius: 8px; font-size: 16px;
+            font-weight: 600; cursor: pointer; transition: var(--transition);
         }
-
         .btn:hover { background-color: var(--primary-hover); }
         .btn:disabled { background-color: #a0aec0; cursor: not-allowed; }
         
         .btn-danger { background-color: var(--danger); width: auto; padding: 10px 20px; font-size: 14px; }
         .btn-danger:hover { background-color: #c53030; }
 
-        /* Разделитель */
-        hr {
-            border: none;
-            border-top: 1px solid #e2e8f0;
-            margin: 40px 0;
-        }
+        hr { border: none; border-top: 1px solid #e2e8f0; margin: 40px 0; }
 
-        /* Списки новостей */
         .news-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            background: #fafafa;
-            transition: var(--transition);
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;
+            margin-bottom: 15px; background: #fafafa;
         }
-
-        .news-item:hover {
-            border-color: #cbd5e0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
-        }
-
         .news-info strong { display: block; font-size: 16px; margin-bottom: 4px; }
         .news-info small { color: var(--text-muted); font-size: 13px; }
 
-        /* Уведомления об ошибках */
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 14px;
-            text-align: center;
-        }
-        .alert-error { background-color: #fed7d7; color: #c53030; }
-
-        /* Центрирование логина */
-        #login-section {
-            max-width: 400px;
-            margin: 0 auto;
-        }
+        #login-section { max-width: 400px; margin: 0 auto; }
     </style>
 </head>
 <body>
 
     <div class="admin-container">
         
-        <!-- 1. Секция входа (Firebase Auth) -->
+        <!-- Секция входа -->
         <div id="login-section">
             <h2 style="text-align: center;">Вход в систему</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label for="email">Email администратора</label>
-                    <input type="email" id="email" placeholder="admin@qzomedicalcollege.kz" required>
+                    <label for="login">Логин</label>
+                    <input type="text" id="login" placeholder="Введите логин" required>
                 </div>
                 <div class="form-group">
                     <label for="password">Пароль</label>
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn" id="login-btn">Войти</button>
-                <div id="login-error" class="alert alert-error hidden"></div>
             </form>
         </div>
 
-        <!-- 2. Панель управления (Открывается после успешного входа) -->
+        <!-- Панель управления -->
         <div id="dashboard-section" class="hidden">
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Управление контентом</h2>
+                <h2>Управление новостями</h2>
                 <button id="logout-btn" class="btn btn-danger">Выйти</button>
             </div>
 
@@ -192,14 +111,14 @@
             <form id="news-form">
                 <div class="form-group">
                     <label for="news_title">Заголовок новости</label>
-                    <input type="text" id="news_title" placeholder="Введите броский заголовок..." required>
+                    <input type="text" id="news_title" placeholder="Введите заголовок..." required>
                 </div>
                 <div class="form-group">
                     <label for="news_text">Текст публикации</label>
                     <textarea id="news_text" rows="5" placeholder="Подробности события..." required></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="news_image">Прикрепить фотографию (до 32 МБ)</label>
+                    <label for="news_image">Прикрепить фотографию</label>
                     <input type="file" id="news_image" accept="image/*">
                 </div>
                 <button type="submit" class="btn" id="news-submit-btn">Опубликовать новость</button>
@@ -215,7 +134,6 @@
 
     </div>
 
-    <!-- Подключаем JavaScript как модуль (обязательно для Firebase v9) -->
-    <script type="module" src="admin.js"></script>
+    <script src="admin.js"></script>
 </body>
 </html>
