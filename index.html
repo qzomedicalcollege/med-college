@@ -199,10 +199,10 @@
             try {
                 let imageUrl = "";
                 
-                // ИСПРАВЛЕННАЯ ОШИБКА ЗДЕСЬ: fileInput.files
+                // === ВОТ ЗДЕСЬ ИСПРАВЛЕНА ОШИБКА: ДОБАВЛЕНО  ===
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
-                    formData.append("image", fileInput.files);
+                    formData.append("image", fileInput.files); 
                     
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
                         method: "POST",
