@@ -6,12 +6,11 @@
     <title>Кызылординский высший медицинский колледж</title>
     
     <script>
-        // Твой ключ ImgBB для картинок
+        // 1. Твой рабочий ключ ImgBB для картинок
         const imgbbKey = "582a59fe4c572868e41343f804672210";
-        // Твой ключ Firebase для авторизации запросов к базе
-        const firebaseApiKey = "AIzaSyAN02sRUHgBWrrpdmOtNBemEhHc192MfZs";
-        // Ссылка на базу данных С ОБЯЗАТЕЛЬНЫМ ключом для Google индентификации
-        const firestoreUrl = `https://firestore.googleapis.com/v1/projects/qzomedicalcollege/databases/(default)/documents/news?key=${firebaseApiKey}`;
+        
+        // 2. Твоя готовая ссылка на Realtime Database
+        const dbUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news.json";
 
         // Загрузка новостей
         async function loadNews() {
@@ -19,31 +18,17 @@
             newsContainer.innerHTML = ''; 
             
             try {
-                const response = await fetch(firestoreUrl);
-                
-                if (!response.ok) {
-                    const errData = await response.json();
-                    throw new Error(errData.error?.message || "Не удалось прочитать базу данных");
-                }
-                
+                const response = await fetch(dbUrl);
                 const data = await response.json();
                 
-                if (!data.documents) {
+                // Если база пустая
+                if (!data) {
                     newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Новостей пока нет.</p>';
                     return;
                 }
 
-                let newsList = data.documents.map(doc => {
-                    const fields = doc.fields || {};
-                    return {
-                        title: fields.title?.stringValue || "Без заголовка",
-                        content: fields.content?.stringValue || "",
-                        imageUrl: fields.imageUrl?.stringValue || "",
-                        timestamp: parseInt(fields.timestamp?.integerValue || "0")
-                    };
-                });
-
-                // Сортировка: новые сверху
+                // Превращаем данные в удобный список и сортируем (новые сверху)
+                let newsList = Object.keys(data).map(key => data[key]);
                 newsList.sort((a, b) => b.timestamp - a.timestamp);
 
                 newsList.forEach((item) => {
@@ -65,7 +50,7 @@
                 });
             } catch (error) {
                 console.error("Ошибка загрузки:", error);
-                newsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка: ${error.message}</p>`;
+                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка подключения к ленте новостей.</p>';
             }
         }
 
@@ -108,7 +93,7 @@
                 location.reload();
             });
 
-            // ПУБЛИКАЦИЯ С ЖЕСТКИМ КОНТРОЛЕМ ОШИБОК СЕРВЕРА
+            // МГНОВЕННАЯ ПУБЛИКАЦИЯ В REALTIME DATABASE
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -124,7 +109,7 @@
                 try {
                     let imageUrl = "";
 
-                    // 1. Загрузка картинки на ImgBB
+                    // Грузим фото на ImgBB
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -137,39 +122,31 @@
                         if (data.success) imageUrl = data.data.url;
                     }
 
-                    // 2. Формирование структуры документа для Firestore REST API
+                    // Отправляем новость в надежную Realtime Database
                     const newDoc = {
-                        fields: {
-                            title: { stringValue: title },
-                            content: { stringValue: content },
-                            imageUrl: { stringValue: imageUrl },
-                            timestamp: { integerValue: Date.now().toString() }
-                        }
+                        title: title,
+                        content: content,
+                        imageUrl: imageUrl,
+                        timestamp: Date.now()
                     };
 
-                    // 3. Отправка в базу данных
-                    const response = await fetch(firestoreUrl, {
+                    const response = await fetch(dbUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newDoc)
                     });
 
-                    // ПРОДВИНУТАЯ ПРОВЕРКА ОТВЕТА GOOGLE СЕРВЕРА
                     if (!response.ok) {
-                        const errData = await response.json();
-                        // Если сервер вернул ошибку, принудительно прерываем скрипт и выводим её текст
-                        throw new Error(errData.error?.message || "База данных отклонила запрос");
+                        throw new Error("Сервер отклонил сохранение.");
                     }
 
-                    alert("Новость успешно сохранена в базу данных!");
+                    alert("Ура! Новость мгновенно опубликована!");
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
-                    fileInput.value = '';
-                    loadNews(); // Перезагружаем ленту новостей
+                    if(fileInput) fileInput.value = '';
+                    loadNews(); // Сразу показываем на экране
                 } catch (error) {
-                    // Теперь здесь покажется реальная причина блокировки
                     alert("Ошибка публикации: " + error.message);
-                    console.error(error);
                 } finally {
                     publishBtn.innerText = "Опубликовать";
                     publishBtn.disabled = false;
