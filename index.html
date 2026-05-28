@@ -201,7 +201,8 @@
                 
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
-                    formData.append("image", fileInput.files); // Квадратные скобки на месте!
+                    // ТЕПЕРЬ НОЛИК И КВАДРАТНЫЕ СКОБКИ НА 100% ТУТ:
+                    formData.append("image", fileInput.files);
                     
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
                         method: "POST",
@@ -210,7 +211,6 @@
                     
                     let imgResult = await imgResponse.json();
                     
-                    // ЕСЛИ СЕРВЕР IMGBB ОТКЛОНИЛ КАРТИНКУ, ВЫВОДИМ ТОЧНУЮ ПРИЧИНУ
                     if (!imgResult.success) {
                         let errorDetail = imgResult.error ? imgResult.error.message : "Неизвестный сбой сервера";
                         throw new Error("Ответ ImgBB: " + errorDetail);
@@ -249,7 +249,6 @@
 
             } catch (e) {
                 status.style.color = "red";
-                // ТЕПЕРЬ ОШИБКА ПОКАЖЕТ ТОЧНУЮ ПРИЧИНУ
                 status.innerText = "Сбой: " + e.message;
             }
             
