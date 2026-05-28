@@ -6,13 +6,9 @@
     <title>Кызылординский высший медицинский колледж</title>
     
     <script>
-        // 1. Твой рабочий ключ ImgBB для картинок
         const imgbbKey = "582a59fe4c572868e41343f804672210";
-        
-        // 2. Твоя готовая ссылка на Realtime Database
         const dbUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news.json";
 
-        // Загрузка новостей
         async function loadNews() {
             const newsContainer = document.getElementById('news-grid');
             newsContainer.innerHTML = ''; 
@@ -21,13 +17,11 @@
                 const response = await fetch(dbUrl);
                 const data = await response.json();
                 
-                // Если база пустая
                 if (!data) {
                     newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Новостей пока нет.</p>';
                     return;
                 }
 
-                // Превращаем данные в удобный список и сортируем (новые сверху)
                 let newsList = Object.keys(data).map(key => data[key]);
                 newsList.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -93,7 +87,6 @@
                 location.reload();
             });
 
-            // МГНОВЕННАЯ ПУБЛИКАЦИЯ В REALTIME DATABASE
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -109,7 +102,6 @@
                 try {
                     let imageUrl = "";
 
-                    // Грузим фото на ImgBB
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -122,7 +114,6 @@
                         if (data.success) imageUrl = data.data.url;
                     }
 
-                    // Отправляем новость в надежную Realtime Database
                     const newDoc = {
                         title: title,
                         content: content,
@@ -144,7 +135,7 @@
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
                     if(fileInput) fileInput.value = '';
-                    loadNews(); // Сразу показываем на экране
+                    loadNews();
                 } catch (error) {
                     alert("Ошибка публикации: " + error.message);
                 } finally {
@@ -209,23 +200,23 @@
     </header>
 
     <nav class="nav-menu">
-        <a href="#">Главная</a>
-        <a href="#">О колледже</a>
-        <a href="#">Абитуриентам</a>
-        <a href="#">Специальности</a>
-        <a href="#">Услуги колледжа</a>
-        <a href="#">Корп. документы</a>
-        <a href="#">Контакты</a>
+        <a href="index.html">Главная</a>
+        <a href="about.html">О колледже</a>
+        <a href="entrants.html">Абитуриентам</a>
+        <a href="specialties.html">Специальности</a>
+        <a href="services.html">Услуги колледжа</a>
+        <a href="documents.html">Корп. документы</a>
+        <a href="contacts.html">Контакты</a>
     </nav>
 
     <section class="hero">
         <h2>Добро пожаловать в Кызылординский высший медицинский колледж</h2>
         <p>Инновационные подходы к медицинскому образованию. Готовим квалифицированных специалистов для здравоохранения Республики Казахстан.</p>
-        <a href="#" class="btn">Поступить в колледж</a>
+        <a href="entrants.html" class="btn">Поступить в колледж</a>
     </section>
 
     <section class="quick-links">
-        <div class="link-card">🎓 АИС Platonus</div>
+        <div class="link-card" onclick="window.open('https://platonus.kz', '_blank')">🎓 АИС Platonus</div>
         <div class="link-card">📚 Цифровая библиотека</div>
         <div class="link-card">🌐 Доступ к SmartNation</div>
         <div class="link-card">📝 Дистанционное обучение</div>
@@ -254,7 +245,7 @@
     <footer>
         <div class="footer-col">
             <h4>О колледже</h4>
-            <a href="#">Информация о колледже</a>
+            <a href="about.html">Информация о колледже</a>
             <a href="#">История колледжа</a>
             <a href="#">Администрация</a>
             <a href="#">Аккредитация</a>
