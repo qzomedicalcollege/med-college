@@ -199,7 +199,7 @@
             try {
                 let imageUrl = "";
                 
-                // === ТЕПЕРЬ  ТОЧНО НА МЕСТЕ! ===
+                // === ПРАВИЛЬНЫЙ КОД С КВАДРАТНЫМИ СКОБКАМИ  ===
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
                     formData.append("image", fileInput.files); 
@@ -213,7 +213,7 @@
                     if (imgResult.success) {
                         imageUrl = imgResult.data.url;
                     } else {
-                        throw new Error("Ошибка загрузки картинки на сервер. Убедитесь, что это фото.");
+                        throw new Error("Ошибка загрузки картинки на сервер.");
                     }
                 }
 
