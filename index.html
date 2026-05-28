@@ -6,32 +6,20 @@
     <title>Қызылорда жоғары медициналық колледжі</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
-        
-        /* Панель языков */
         .lang-switcher { background-color: #f1f1f1; text-align: right; padding: 5px 20px; font-size: 14px; }
         .lang-switcher a { text-decoration: none; margin: 0 10px; font-weight: bold; }
         .lang-kaz { color: #0056b3; }
         .lang-other { color: #666; }
-
-        /* Шапка сайта с логотипом */
         header { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; background-color: #ffffff; }
         header img { height: 80px; }
         header h1 { color: #0056b3; margin: 0; font-size: 26px; }
-        
-        /* Навигация */
         nav { background-color: #0056b3; padding: 15px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
         .college-btn { color: white; text-decoration: none; padding: 10px 20px; border: 1px solid white; border-radius: 5px; font-weight: bold; transition: 0.3s; }
         .college-btn:hover { background-color: white; color: #0056b3; }
-        
-        /* Контент */
         .container { max-width: 800px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         .news-item { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
         .news-item img { max-width: 100%; border-radius: 5px; margin-top: 10px; }
-        
-        /* Подвал */
         footer { background-color: #333; color: white; text-align: center; padding: 20px; margin-top: 20px; line-height: 1.6; }
-        
-        /* Админка и Кнопка удаления */
         .admin-panel { display: none; background: #e9ecef; padding: 20px; margin-top: 20px; border-radius: 5px; }
         input, textarea, select, button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
         button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
@@ -42,67 +30,55 @@
 </head>
 <body>
 
-    <!-- Панель переключения языков -->
     <div class="lang-switcher">
         <a href="#" class="lang-kaz">ҚАЗ</a> | 
         <a href="#" class="lang-other">РУС</a> | 
         <a href="#" class="lang-other">ENG</a>
     </div>
 
-    <!-- Шапка с Логотипом -->
     <header>
         <img src="https://kzmedicalcollege.kz/wp-content/uploads/2022/05/cropped-logo.png" alt="Колледж логотипі">
         <h1>Қызылорда жоғары медициналық колледжі</h1>
     </header>
 
-    <!-- Главное меню -->
     <nav>
-        <a href="index.html" class="college-btn">Басты бет</a>
-        <a href="about.html" class="college-btn">Колледж Туралы</a>
-        <a href="entrants.html" class="college-btn">Талапкерге</a>
-        <a href="students.html" class="college-btn">Студентке</a>
-        <a href="#news" class="college-btn">Жаңалықтар</a>
+        <a href="index.html" class="college-btn">О колледже</a>
+        <a href="entrants.html" class="college-btn">Абитуриентам</a>
+        <a href="specialties.html" class="college-btn">Специальности</a>
+        <a href="services.html" class="college-btn">Услуги колледжа</a>
+        <a href="documents.html" class="college-btn">Корп. документы</a>
     </nav>
 
-    <!-- Блок контента -->
     <div class="container" id="news">
         <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">Жаңалықтар</h2>
         <div id="news-container">Загрузка новостей...</div>
 
-        <!-- Кнопка входа -->
         <button id="show-login-btn" style="background: none; color: #ccc; border: none; font-size: 12px; margin-top: 30px; cursor: pointer; width: auto; padding: 0;">Вход для администратора</button>
 
-        <!-- Форма логина -->
         <div id="login-panel" style="display: none; margin-top: 10px;">
             <input type="text" id="admin-login" placeholder="Логин">
             <input type="password" id="admin-password" placeholder="Пароль">
             <button onclick="checkLogin()">Войти</button>
         </div>
 
-        <!-- Панель публикации -->
         <div class="admin-panel" id="admin-panel">
             <h3 style="margin-top: 0; color: #333;">Редактор сайта</h3>
-            
             <label style="font-weight: bold; font-size: 14px;">Куда публикуем?</label>
             <select id="publish-category">
                 <option value="news">Жаңалықтар (В ленту новостей)</option>
-                <option value="about">Колледж Туралы (О колледже)</option>
-                <option value="entrants">Талапкерге (Абитуриентам)</option>
-                <option value="students">Студентке (Студентам)</option>
+                <option value="about">О колледже</option>
+                <option value="entrants">Абитуриентам</option>
+                <option value="specialties">Специальности</option>
             </select>
-
             <input type="text" id="news-title" placeholder="Заголовок">
             <textarea id="news-text" rows="5" placeholder="Основной текст"></textarea>
-            
             <label style="font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block;">Прикрепить фото (если нужно):</label>
             <input type="file" id="news-image" accept="image/*">
-            
             <button id="publish-btn" onclick="publishNews()">Опубликовать</button>
             <p id="publish-status" style="font-weight: bold; margin-bottom: 0;"></p>
         </div>
     </div>
 
-    <!-- Официальные контакты в подвале -->
     <footer>
         <p style="margin: 0; font-size: 16px; font-weight: bold;">Қызылорда жоғары медициналық колледжі</p>
         <p style="margin: 5px 0 0 0; font-size: 14px;">г. Кызылорда, ул. Ы.Жахаева 18</p>
@@ -110,7 +86,6 @@
         <p style="margin: 5px 0 0 0; font-size: 14px;">Email: kzmediccollege@mail.kz</p>
     </footer>
 
-    <!-- Логика сайта (Бэкенд) -->
     <script>
         const baseUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/";
         const imgbbKey = "582a59fe4c572868e41343f804672210";
@@ -121,23 +96,17 @@
             try {
                 let response = await fetch(baseUrl + "news.json");
                 let data = await response.json();
-                
                 container.innerHTML = "";
-                
                 if (!data) {
                     container.innerHTML = "<p>Жаңалықтар әлі жоқ (Новостей пока нет)</p>";
                     return;
                 }
-
                 let entries = Object.entries(data).reverse();
-                
                 entries.forEach(([key, news]) => {
                     let div = document.createElement("div");
                     div.className = "news-item";
                     let imgHtml = news.image ? `<img src="${news.image}" alt="Фото">` : "";
-                    
                     let deleteBtnHtml = `<button class="delete-btn" onclick="deletePost('news', '${key}')" ${isAdmin ? 'style="display:block;"' : ''}>Удалить запись</button>`;
-
                     div.innerHTML = `
                         <h3 style="margin-bottom: 5px;">${news.title}</h3>
                         <small style="color: #888; display: block; margin-bottom: 10px;">${news.date}</small>
@@ -155,7 +124,7 @@
         async function deletePost(category, id) {
             if(confirm("Вы уверены, что хотите безвозвратно удалить эту публикацию?")) {
                 await fetch(baseUrl + category + "/" + id + ".json", { method: "DELETE" });
-                loadNews(); 
+                loadNews();
             }
         }
 
@@ -166,7 +135,6 @@
         function checkLogin() {
             let login = document.getElementById("admin-login").value;
             let pass = document.getElementById("admin-password").value;
-            
             if (login === "admin" && pass === "admin") {
                 isAdmin = true;
                 document.getElementById("login-panel").style.display = "none";
@@ -177,6 +145,14 @@
                 alert("Неверный логин или пароль!");
             }
         }
+
+        // === ПРАВИЛЬНЫЙ КОНВЕРТЕР BASE64: ДОБАВЛЕНА [2] ДЛЯ ПОЛУЧЕНИЯ ЧИСТОГО КОДА ===
+        const getBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[2]); // Отсекаем техническую приписку браузера
+            reader.onerror = error => reject(error);
+        });
 
         async function publishNews() {
             const category = document.getElementById("publish-category").value;
@@ -198,24 +174,26 @@
 
             try {
                 let imageUrl = "";
-                
-                // === ТЕПЕРЬ ОТПРАВЛЯЕМ КАРТИНКУ НАПРЯМУЮ, И  НА 100% ЗДЕСЬ! ===
+
+                // === ОТПРАВЛЯЕМ КАРТИНКУ КАК BASE64, ИСПОЛЬЗУЯ ФАЙЛ  ===
                 if (fileInput.files.length > 0) {
+                    let base64Image = await getBase64(fileInput.files); // Строго первый файл
+
                     let formData = new FormData();
-                    formData.append("image", fileInput.files); // ТОТ САМЫЙ НОЛИК!
-                    
+                    formData.append("image", base64Image); 
+
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
                         method: "POST",
                         body: formData
                     });
-                    
+
                     let imgResult = await imgResponse.json();
-                    
+
                     if (!imgResult.success) {
                         let errorDetail = imgResult.error ? imgResult.error.message : "Неизвестный сбой сервера";
                         throw new Error("Ответ ImgBB: " + errorDetail);
                     }
-                    
+
                     imageUrl = imgResult.data.url;
                 }
 
@@ -226,7 +204,6 @@
                     date: new Date().toLocaleString("ru-RU")
                 };
 
-                // Отправляем текст в Realtime Database
                 let dbResponse = await fetch(baseUrl + category + ".json", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -239,11 +216,10 @@
 
                 status.style.color = "green";
                 status.innerText = "Сәтті жарияланды! (Успешно опубликовано)";
-                
                 document.getElementById("news-title").value = "";
                 document.getElementById("news-text").value = "";
                 fileInput.value = "";
-                
+
                 if(category === "news") {
                     loadNews();
                 }
@@ -252,7 +228,7 @@
                 status.style.color = "red";
                 status.innerText = "Сбой: " + e.message;
             }
-            
+
             btn.innerText = "Опубликовать";
             btn.disabled = false;
         }
