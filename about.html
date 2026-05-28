@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Колледж Туралы - Қызылорда жоғары медициналық колледжі</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
+        
+        /* Панель языков */
+        .lang-switcher { background-color: #f1f1f1; text-align: right; padding: 5px 20px; font-size: 14px; }
+        .lang-switcher a { text-decoration: none; margin: 0 10px; font-weight: bold; }
+        .lang-kaz { color: #0056b3; }
+        .lang-other { color: #666; }
+
+        /* Шапка сайта с логотипом */
+        header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 20px; 
+            padding: 20px; 
+            background-color: #ffffff; 
+        }
+        header img { height: 80px; }
+        header h1 { color: #0056b3; margin: 0; font-size: 26px; }
+        
+        /* Навигация */
+        nav { background-color: #0056b3; padding: 15px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+        .college-btn { color: white; text-decoration: none; padding: 10px 20px; border: 1px solid white; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .college-btn:hover { background-color: white; color: #0056b3; }
+        
+        /* Контент */
+        .container { max-width: 800px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .content-item { border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 15px; }
+        .content-item img { max-width: 100%; border-radius: 5px; margin-top: 10px; }
+        
+        /* Подвал */
+        footer { background-color: #333; color: white; text-align: center; padding: 20px; margin-top: 20px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <!-- Панель языков -->
+    <div class="lang-switcher">
+        <a href="#" class="lang-kaz">ҚАЗ</a> | 
+        <a href="#" class="lang-other">РУС</a> | 
+        <a href="#" class="lang-other">ENG</a>
+    </div>
+
+    <!-- Шапка -->
+    <header>
+        <img src="https://kzmedicalcollege.kz/wp-content/uploads/2022/05/cropped-logo.png" alt="Колледж логотипі">
+        <h1>Қызылорда жоғары медициналық колледжі</h1>
+    </header>
+
+    <!-- Главное меню -->
+    <nav>
+        <a href="index.html" class="college-btn">Басты бет</a>
+        <a href="about.html" class="college-btn">Колледж Туралы</a>
+        <a href="entrants.html" class="college-btn">Талапкерге</a>
+        <a href="students.html" class="college-btn">Студентке</a>
+        <a href="index.html#news" class="college-btn">Жаңалықтар</a>
+    </nav>
+
+    <!-- Блок контента -->
+    <div class="container">
+        <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">Колледж Туралы</h2>
+        <div id="about-container">Ақпарат жүктелуде (Загрузка информации)...</div>
+    </div>
+
+    <!-- Подвал -->
+    <footer>
+        <p style="margin: 0; font-size: 16px; font-weight: bold;">Қызылорда жоғары медициналық колледжі</p>
+        <p style="margin: 5px 0 0 0; font-size: 14px;">г. Кызылорда, ул. Ы.Жахаева 18</p>
+        <p style="margin: 5px 0 0 0; font-size: 14px;">Тел: +7 7242 23-05-13 | Факс: +7 7242 23-05-13</p>
+        <p style="margin: 5px 0 0 0; font-size: 14px;">Email: kzmediccollege@mail.kz</p>
+    </footer>
+
+    <!-- Скрипт связи с базой данных Firebase для этой страницы -->
+    <script>
+        // Ссылка ведет именно в раздел "about.json"
+        const dbUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/about.json";
+
+        async function loadContent() {
+            const container = document.getElementById("about-container");
+            try {
+                let response = await fetch(dbUrl);
+                let data = await response.json();
+                
+                container.innerHTML = "";
+                
+                if (!data) {
+                    container.innerHTML = "<p>Мұнда әзірге ақпарат жоқ (Информация пока не добавлена)</p>";
+                    return;
+                }
+
+                let contentArray = Object.values(data).reverse();
+                
+                contentArray.forEach(item => {
+                    let div = document.createElement("div");
+                    div.className = "content-item";
+                    let imgHtml = item.image ? `<img src="${item.image}" alt="Фото">` : "";
+                    div.innerHTML = `
+                        <h3 style="margin-bottom: 5px;">${item.title}</h3>
+                        <p style="line-height: 1.5; white-space: pre-wrap;">${item.text}</p>
+                        ${imgHtml}
+                    `;
+                    container.appendChild(div);
+                });
+            } catch (e) {
+                container.innerHTML = "<p style='color: red;'>Ошибка загрузки базы данных</p>";
+            }
+        }
+
+        loadContent();
+    </script>
+</body>
+</html>
