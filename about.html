@@ -14,14 +14,7 @@
         .lang-other { color: #666; }
 
         /* Шапка сайта с логотипом */
-        header { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 20px; 
-            padding: 20px; 
-            background-color: #ffffff; 
-        }
+        header { display: flex; align-items: center; justify-content: center; gap: 20px; padding: 20px; background-color: #ffffff; }
         header img { height: 80px; }
         header h1 { color: #0056b3; margin: 0; font-size: 26px; }
         
@@ -37,6 +30,10 @@
         
         /* Подвал */
         footer { background-color: #333; color: white; text-align: center; padding: 20px; margin-top: 20px; line-height: 1.6; }
+
+        /* Админка на странице */
+        input, button { padding: 10px; border-radius: 5px; border: 1px solid #ccc; margin-bottom: 10px; width: 100%; box-sizing: border-box; }
+        .admin-btn { padding: 5px 15px; font-size: 12px; font-weight: bold; cursor: pointer; border: none; border-radius: 3px; color: white; margin-top: 10px; margin-right: 5px; width: auto; }
     </style>
 </head>
 <body>
@@ -67,6 +64,16 @@
     <div class="container">
         <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">Колледж Туралы</h2>
         <div id="about-container">Ақпарат жүктелуде (Загрузка информации)...</div>
+
+        <!-- Кнопка входа -->
+        <button id="show-login-btn" style="background: none; color: #ccc; border: none; font-size: 12px; margin-top: 30px; cursor: pointer; width: auto; padding: 0;">Вход для администратора</button>
+
+        <!-- Форма логина -->
+        <div id="login-panel" style="display: none; margin-top: 10px;">
+            <input type="text" id="admin-login" placeholder="Логин">
+            <input type="password" id="admin-password" placeholder="Пароль">
+            <button onclick="checkLogin()" style="background-color: #28a745; color: white; font-weight: bold; cursor: pointer;">Войти</button>
+        </div>
     </div>
 
     <!-- Подвал -->
@@ -77,34 +84,43 @@
         <p style="margin: 5px 0 0 0; font-size: 14px;">Email: kzmediccollege@mail.kz</p>
     </footer>
 
-    <!-- Скрипт связи с базой данных Firebase для этой страницы -->
+    <!-- Скрипт связи с базой данных Firebase -->
     <script>
-        // Ссылка ведет именно в раздел "about.json"
-        const dbUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/about.json";
+        const baseUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/";
+        let isAdmin = false;
+        let pageData = {}; // Здесь будем хранить загруженные данные
 
         async function loadContent() {
             const container = document.getElementById("about-container");
             try {
-                let response = await fetch(dbUrl);
-                let data = await response.json();
+                let response = await fetch(baseUrl + "about.json");
+                pageData = await response.json();
                 
                 container.innerHTML = "";
                 
-                if (!data) {
+                if (!pageData) {
                     container.innerHTML = "<p>Мұнда әзірге ақпарат жоқ (Информация пока не добавлена)</p>";
                     return;
                 }
 
-                let contentArray = Object.values(data).reverse();
+                let entries = Object.entries(pageData).reverse();
                 
-                contentArray.forEach(item => {
+                entries.forEach(([key, item]) => {
                     let div = document.createElement("div");
                     div.className = "content-item";
                     let imgHtml = item.image ? `<img src="${item.image}" alt="Фото">` : "";
+                    
+                    // Кнопки редактирования и удаления (изначально скрыты)
+                    let adminBtns = `<div class="admin-controls" style="display: ${isAdmin ? 'block' : 'none'};">
+                        <button class="admin-btn" style="background-color: #ffc107; color: black;" onclick="editPost('${key}')">Редактировать текст</button>
+                        <button class="admin-btn" style="background-color: #dc3545;" onclick="deletePost('${key}')">Удалить</button>
+                    </div>`;
+
                     div.innerHTML = `
                         <h3 style="margin-bottom: 5px;">${item.title}</h3>
                         <p style="line-height: 1.5; white-space: pre-wrap;">${item.text}</p>
                         ${imgHtml}
+                        ${adminBtns}
                     `;
                     container.appendChild(div);
                 });
@@ -113,7 +129,52 @@
             }
         }
 
+        // Проверка логина
+        document.getElementById("show-login-btn").onclick = () => {
+            document.getElementById("login-panel").style.display = "block";
+        };
+
+        function checkLogin() {
+            let login = document.getElementById("admin-login").value;
+            let pass = document.getElementById("admin-password").value;
+            
+            if (login === "admin" && pass === "admin") {
+                isAdmin = true;
+                document.getElementById("login-panel").style.display = "none";
+                document.getElementById("show-login-btn").style.display = "none";
+                
+                // Показываем кнопки управления
+                document.querySelectorAll('.admin-controls').forEach(btn => btn.style.display = 'block');
+            } else {
+                alert("Неверный логин или пароль!");
+            }
+        }
+
+        // Функция удаления
+        async function deletePost(id) {
+            if(confirm("Вы уверены, что хотите безвозвратно удалить этот блок?")) {
+                await fetch(baseUrl + "about/" + id + ".json", { method: "DELETE" });
+                loadContent(); // Перезагружаем контент
+            }
+        }
+
+        // Функция редактирования текста
+        async function editPost(id) {
+            let oldText = pageData[id].text;
+            let newText = prompt("Отредактируйте текст:", oldText);
+            
+            // Если текст изменили и не нажали "Отмена"
+            if(newText !== null && newText.trim() !== "") {
+                // Отправляем измененный текст в базу данных
+                await fetch(baseUrl + "about/" + id + ".json", {
+                    method: "PATCH", // Команда для частичного обновления
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: newText })
+                });
+                loadContent(); // Перезагружаем контент для отображения изменений
+            }
+        }
+
         loadContent();
     </script>
 </body>
-</html>
