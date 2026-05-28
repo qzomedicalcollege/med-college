@@ -3,7 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Павлодарский высший медицинский колледж</title>
+    <title>Кызылординский высший медицинский колледж</title>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // ТВОИ КЛЮЧИ FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyAN02sRUHgBWrrpdmOtNBemEhHc192MfZs",
+            authDomain: "qzomedicalcollege.firebaseapp.com",
+            projectId: "qzomedicalcollege",
+            storageBucket: "qzomedicalcollege.firebasestorage.app",
+            messagingSenderId: "728480745712",
+            appId: "1:728480745712:web:b9007f10890a0b1ccada35"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Функция для загрузки новостей из базы
+        async function loadNews() {
+            const newsContainer = document.getElementById('news-grid');
+            newsContainer.innerHTML = ''; // Очищаем статику
+            
+            try {
+                const q = query(collection(db, "news"), orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Новостей пока нет.</p>';
+                    return;
+                }
+
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const date = data.timestamp ? new Date(data.timestamp).toLocaleDateString('ru-RU') : 'Недавнее';
+                    
+                    const newsHTML = `
+                        <div class="news-item">
+                            <img src="${data.imageUrl || 'https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?w=500&q=80'}" alt="News" class="news-img">
+                            <div class="news-content">
+                                <span class="news-date">${date}</span>
+                                <h3>${data.title}</h3>
+                                <p>${data.content}</p>
+                            </div>
+                        </div>
+                    `;
+                    newsContainer.innerHTML += newsHTML;
+                });
+            } catch (error) {
+                console.error("Ошибка загрузки новостей:", error);
+                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка подключения к базе данных.</p>';
+            }
+        }
+
+        // Авторизация и панель админа
+        document.addEventListener('DOMContentLoaded', () => {
+            loadNews();
+
+            const adminBtn = document.getElementById('admin-btn');
+            const loginForm = document.getElementById('login-form');
+            const addNewsForm = document.getElementById('add-news-form');
+            const logoutBtn = document.getElementById('logout-btn');
+
+            adminBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (!auth.currentUser) loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+            });
+
+            document.getElementById('login-btn').addEventListener('click', () => {
+                const email = document.getElementById('email').value;
+                const pass = document.getElementById('password').value;
+                signInWithEmailAndPassword(auth, email, pass)
+                    .then(() => {
+                        alert("Вход выполнен успешно!");
+                        loginForm.style.display = 'none';
+                    })
+                    .catch((error) => alert("Ошибка входа: " + error.message));
+            });
+
+            logoutBtn.addEventListener('click', () => {
+                signOut(auth).then(() => alert("Вы вышли из системы"));
+            });
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    addNewsForm.style.display = 'block';
+                    adminBtn.style.display = 'none';
+                } else {
+                    addNewsForm.style.display = 'none';
+                    adminBtn.style.display = 'inline';
+                }
+            });
+
+            document.getElementById('publish-btn').addEventListener('click', async () => {
+                const title = document.getElementById('news-title').value;
+                const content = document.getElementById('news-content').value;
+                const imageUrl = document.getElementById('news-img-url').value;
+
+                if (!title || !content) return alert("Заполните заголовок и текст!");
+
+                try {
+                    await addDoc(collection(db, "news"), {
+                        title: title,
+                        content: content,
+                        imageUrl: imageUrl,
+                        timestamp: Date.now()
+                    });
+                    alert("Новость опубликована!");
+                    document.getElementById('news-title').value = '';
+                    document.getElementById('news-content').value = '';
+                    document.getElementById('news-img-url').value = '';
+                    loadNews(); // Обновляем ленту
+                } catch (error) {
+                    alert("Ошибка публикации: " + error.message);
+                }
+            });
+        });
+    </script>
     <style>
         :root {
             --main-blue: #004d99;
@@ -12,96 +131,41 @@
             --text-dark: #333;
             --bg-light: #f4f7f6;
         }
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-        }
-        body { 
-            background-color: var(--bg-light); 
-            color: var(--text-dark); 
-            line-height: 1.6; 
-        }
-        a { 
-            text-decoration: none; 
-            transition: 0.3s; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-light); color: var(--text-dark); line-height: 1.6; }
+        a { text-decoration: none; transition: 0.3s; }
 
         /* Верхняя панель */
-        .top-bar {
-            background-color: var(--main-blue);
-            color: white;
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 10%;
-            font-size: 13px;
-        }
+        .top-bar { background-color: var(--main-blue); color: white; display: flex; justify-content: space-between; padding: 8px 10%; font-size: 13px; }
         .top-bar a { color: white; margin-left: 15px; }
         .top-bar a:hover { color: var(--accent-gold); }
 
-        /* Шапка с логотипом */
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 10%;
-            background: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+        /* Шапка */
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 20px 10%; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-wrap: wrap; gap: 20px; }
         .logo-section { display: flex; align-items: center; gap: 15px; }
-        .logo-placeholder {
-            width: 70px; height: 70px;
-            background: var(--main-blue);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            color: white; font-weight: bold; font-size: 24px;
-        }
+        .logo-placeholder { width: 70px; height: 70px; background: var(--main-blue); border-radius: 50%; display: flex; justify-content: center; align-items: center; color: white; font-weight: bold; font-size: 24px; }
         .college-name h1 { font-size: 20px; color: var(--main-blue); text-transform: uppercase; }
         .college-name p { font-size: 14px; color: #666; }
         .contacts { text-align: right; font-weight: bold; color: var(--main-blue); }
 
-        /* Навигационное меню */
-        .nav-menu {
-            background-color: var(--light-blue);
-            display: flex; justify-content: center; flex-wrap: wrap; gap: 30px;
-            padding: 15px 10%;
-            position: sticky; top: 0; z-index: 100;
-        }
+        /* Меню */
+        .nav-menu { background-color: var(--light-blue); display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; padding: 15px 10%; position: sticky; top: 0; z-index: 100; }
         .nav-menu a { color: white; font-weight: bold; font-size: 15px; text-transform: uppercase; }
         .nav-menu a:hover { color: var(--accent-gold); }
 
-        /* Главный баннер */
-        .hero {
-            background: linear-gradient(rgba(0, 77, 153, 0.7), rgba(0, 77, 153, 0.7)), url('https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
-            color: white; text-align: center;
-            padding: 100px 20px;
-        }
+        /* Баннер */
+        .hero { background: linear-gradient(rgba(0, 77, 153, 0.7), rgba(0, 77, 153, 0.7)), url('https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover; color: white; text-align: center; padding: 100px 20px; }
         .hero h2 { font-size: 36px; margin-bottom: 20px; }
         .hero p { font-size: 18px; max-width: 800px; margin: 0 auto; }
-        .btn {
-            display: inline-block; margin-top: 30px; padding: 12px 30px;
-            background: var(--accent-gold); color: var(--main-blue);
-            font-weight: bold; border-radius: 5px; font-size: 16px;
-        }
+        .btn { display: inline-block; margin-top: 30px; padding: 12px 30px; background: var(--accent-gold); color: var(--main-blue); font-weight: bold; border-radius: 5px; font-size: 16px; }
         .btn:hover { background: white; }
 
-        /* Информационные системы */
-        .quick-links {
-            display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;
-            padding: 40px 10%; margin-top: -30px;
-        }
-        .link-card {
-            background: white; padding: 20px; border-radius: 8px; width: 220px;
-            text-align: center; font-weight: bold; color: var(--main-blue);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 4px solid var(--accent-gold);
-            transition: transform 0.3s; cursor: pointer;
-        }
+        /* Системы */
+        .quick-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 40px 10%; margin-top: -30px; }
+        .link-card { background: white; padding: 20px; border-radius: 8px; width: 220px; text-align: center; font-weight: bold; color: var(--main-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 4px solid var(--accent-gold); transition: transform 0.3s; cursor: pointer; }
         .link-card:hover { transform: translateY(-5px); }
 
-        /* Секция новостей */
+        /* Новости и Админка */
         .news-section { padding: 50px 10%; }
         .section-title { text-align: center; color: var(--main-blue); font-size: 28px; margin-bottom: 30px; }
         .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
@@ -111,53 +175,45 @@
         .news-date { font-size: 12px; color: #888; margin-bottom: 10px; display: block; }
         .news-content h3 { font-size: 18px; color: var(--main-blue); margin-bottom: 10px; }
         .news-content p { font-size: 14px; color: #555; }
+        
+        /* Стили админ-панели */
+        .admin-panel { max-width: 600px; margin: 0 auto 40px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 5px solid var(--main-blue); display: none; }
+        .admin-panel input, .admin-panel textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .admin-panel button { padding: 10px 20px; background: var(--main-blue); color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .admin-panel button:hover { background: var(--light-blue); }
 
         /* Подвал */
-        footer {
-            background: var(--text-dark); color: white;
-            padding: 40px 10% 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px;
-        }
+        footer { background: var(--text-dark); color: white; padding: 40px 10% 20px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
         .footer-col { min-width: 200px; }
         .footer-col h4 { color: var(--accent-gold); margin-bottom: 15px; }
         .footer-col p, .footer-col a { color: #ccc; font-size: 14px; display: block; margin-bottom: 8px; }
         .footer-col a:hover { color: white; }
         .footer-bottom { width: 100%; text-align: center; border-top: 1px solid #555; padding-top: 20px; margin-top: 20px; font-size: 13px; color: #aaa; }
         
-        /* Адаптивность для мобильных телефонов */
-        @media (max-width: 768px) {
-            .header { justify-content: center; text-align: center; }
-            .contacts { text-align: center; margin-top: 10px; }
-            .top-bar { flex-direction: column; align-items: center; gap: 10px; }
-            .nav-menu { flex-direction: column; text-align: center; gap: 15px; }
-        }
+        @media (max-width: 768px) { .header { justify-content: center; text-align: center; } .contacts { text-align: center; margin-top: 10px; } .top-bar { flex-direction: column; align-items: center; gap: 10px; } .nav-menu { flex-direction: column; text-align: center; gap: 15px; } }
     </style>
 </head>
 <body>
 
-    <!-- Верхняя техническая панель -->
     <div class="top-bar">
         <div>👁 Версия для слабовидящих</div>
-        <div>
-            <a href="#">ҚАЗ</a> | <a href="#">РУС</a> | <a href="#">ENG</a>
-        </div>
+        <div><a href="#">ҚАЗ</a> | <a href="#">РУС</a> | <a href="#">ENG</a></div>
     </div>
 
-    <!-- Шапка с логотипом -->
     <header class="header">
         <div class="logo-section">
             <div class="logo-placeholder">МК</div>
             <div class="college-name">
-                <h1>Павлодарский высший<br>медицинский колледж</h1>
+                <h1>Кызылординский высший<br>медицинский колледж</h1>
                 <p>КГП на ПХВ Управления здравоохранения</p>
             </div>
         </div>
         <div class="contacts">
             <p>📞 Приемная комиссия:</p>
-            <p style="font-size: 20px; color: #333;">+7 (7182) 00-00-00</p>
+            <p style="font-size: 20px; color: #333;">+7 (7242) 00-00-00</p>
         </div>
     </header>
 
-    <!-- Меню навигации -->
     <nav class="nav-menu">
         <a href="#">Главная</a>
         <a href="#">Колледж</a>
@@ -167,14 +223,12 @@
         <a href="#">Контакты</a>
     </nav>
 
-    <!-- Главный баннер -->
     <section class="hero">
-        <h2>Добро пожаловать в Павлодарский высший медицинский колледж</h2>
+        <h2>Добро пожаловать в Кызылординский высший медицинский колледж</h2>
         <p>Инновационные подходы к медицинскому образованию. Готовим квалифицированных специалистов для здравоохранения Республики Казахстан.</p>
         <a href="#" class="btn">Поступить в колледж</a>
     </section>
 
-    <!-- Быстрые ссылки (Информационные системы) -->
     <section class="quick-links">
         <div class="link-card">🎓 АИС Platonus</div>
         <div class="link-card">📚 Электронная библиотека</div>
@@ -182,38 +236,23 @@
         <div class="link-card">📝 Дистанционное обучение</div>
     </section>
 
-    <!-- Новости -->
     <section class="news-section">
         <h2 class="section-title">Новости и события</h2>
-        <div class="news-grid">
-            <div class="news-item">
-                <img src="https://images.unsplash.com/photo-1581056771107-24ca5f033842?w=500&q=80" alt="Практика" class="news-img">
-                <div class="news-content">
-                    <span class="news-date">28 Мая 2026</span>
-                    <h3>Защита дипломных работ выпускников</h3>
-                    <p>В колледже стартовала итоговая государственная аттестация по специальности «Сестринское дело».</p>
-                </div>
-            </div>
-            <div class="news-item">
-                <img src="https://images.unsplash.com/photo-1516549655169-df83a0774514?w=500&q=80" alt="Больница" class="news-img">
-                <div class="news-content">
-                    <span class="news-date">25 Мая 2026</span>
-                    <h3>Клиническая практика в больницах города</h3>
-                    <p>Студенты успешно завершили практические занятия в инфекционном и хирургическом отделениях.</p>
-                </div>
-            </div>
-            <div class="news-item">
-                <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?w=500&q=80" alt="Симуляционный центр" class="news-img">
-                <div class="news-content">
-                    <span class="news-date">20 Мая 2026</span>
-                    <h3>День открытых дверей для школьников</h3>
-                    <p>Будущие абитуриенты посетили симуляционный центр колледжа и ознакомились с правилами приема.</p>
-                </div>
-            </div>
+
+        <div id="add-news-form" class="admin-panel">
+            <h3 style="color: var(--main-blue); margin-bottom: 15px;">➕ Добавить новость</h3>
+            <input type="text" id="news-title" placeholder="Заголовок новости">
+            <textarea id="news-content" rows="4" placeholder="Текст новости..."></textarea>
+            <input type="text" id="news-img-url" placeholder="URL картинки (ссылка на фото)">
+            <button id="publish-btn">Опубликовать</button>
+            <button id="logout-btn" style="background: #dc3545; margin-left: 10px;">Выйти</button>
+        </div>
+
+        <div id="news-grid" class="news-grid">
+            <p style="text-align: center; grid-column: 1 / -1;">Загрузка новостей...</p>
         </div>
     </section>
 
-    <!-- Подвал -->
     <footer>
         <div class="footer-col">
             <h4>О колледже</h4>
@@ -223,19 +262,30 @@
         </div>
         <div class="footer-col">
             <h4>Контакты</h4>
-            <p>📍 г. Павлодар, ул. Исиналиева, 2</p>
-            <p>📞 +7 (7182) 00-00-00</p>
-            <p>✉️ info@pvlmedcollege.kz</p>
+            <p>📍 г. Кызылорда, [Адрес колледжа]</p>
+            <p>📞 +7 (7242) 00-00-00</p>
+            <p>✉️ info@qzomedicalcollege.kz</p>
         </div>
-        <div class="footer-col">
+        <div class="footer-col" id="auth-section">
             <h4>Мы в соцсетях</h4>
             <a href="#">Instagram</a>
             <a href="#">Facebook</a>
             <a href="#">YouTube</a>
+            <br>
+            <a href="#" id="admin-btn" style="color: #666; font-size: 12px; margin-top: 20px;">Вход для администратора</a>
+            <div id="login-form" style="display: none; margin-top: 10px;">
+                <input type="email" id="email" placeholder="Email" style="width: 100%; padding: 5px; margin-bottom: 5px;">
+                <input type="password" id="password" placeholder="Пароль" style="width: 100%; padding: 5px; margin-bottom: 5px;">
+                <button id="login-btn" style="width: 100%; padding: 5px; cursor: pointer;">Войти</button>
+            </div>
         </div>
         <div class="footer-bottom">
-            <p>© 2026 Павлодарский высший медицинский колледж. Все права защищены.</p>
+            <p>© 2026 Кызылординский высший медицинский колледж. Все права защищены.</p>
         </div>
+    </footer>
+
+</body>
+</html>
     </footer>
 
 </body>
