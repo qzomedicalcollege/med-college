@@ -13,9 +13,17 @@
         .lang-kaz { color: #0056b3; }
         .lang-other { color: #666; }
 
-        /* Шапка сайта */
-        header { text-align: center; padding: 20px; background-color: #ffffff; }
-        header h1 { color: #0056b3; margin: 0; font-size: 24px; }
+        /* Шапка сайта с логотипом */
+        header { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 20px; 
+            padding: 20px; 
+            background-color: #ffffff; 
+        }
+        header img { height: 80px; } /* Размер логотипа */
+        header h1 { color: #0056b3; margin: 0; font-size: 26px; }
         
         /* Навигация */
         nav { background-color: #0056b3; padding: 15px; text-align: center; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
@@ -32,7 +40,7 @@
         
         /* Админка */
         .admin-panel { display: none; background: #e9ecef; padding: 20px; margin-top: 20px; border-radius: 5px; }
-        input, textarea, button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        input, textarea, select, button { width: 100%; margin-bottom: 10px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
         button { background-color: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
         button:hover { background-color: #218838; }
     </style>
@@ -46,8 +54,9 @@
         <a href="#" class="lang-other">ENG</a>
     </div>
 
-    <!-- Шапка -->
+    <!-- Шапка с Логотипом -->
     <header>
+        <img src="https://kzmedicalcollege.kz/wp-content/uploads/2022/05/cropped-logo.png" alt="Колледж логотипі">
         <h1>Қызылорда жоғары медициналық колледжі</h1>
     </header>
 
@@ -60,7 +69,7 @@
         <a href="#news" class="college-btn">Жаңалықтар</a>
     </nav>
 
-    <!-- Блок новостей -->
+    <!-- Блок контента -->
     <div class="container" id="news">
         <h2 style="color: #0056b3; border-bottom: 2px solid #0056b3; padding-bottom: 10px;">Жаңалықтар</h2>
         <div id="news-container">Загрузка новостей...</div>
@@ -75,13 +84,24 @@
             <button onclick="checkLogin()">Войти</button>
         </div>
 
-        <!-- Панель публикации -->
+        <!-- Прокачанная панель публикации -->
         <div class="admin-panel" id="admin-panel">
-            <h3 style="margin-top: 0;">Добавить жаңалық</h3>
-            <input type="text" id="news-title" placeholder="Заголовок новости">
-            <textarea id="news-text" rows="4" placeholder="Текст новости"></textarea>
-            <label style="font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block;">Прикрепить фото (макс 32 МБ):</label>
+            <h3 style="margin-top: 0; color: #333;">Редактор сайта</h3>
+            
+            <label style="font-weight: bold; font-size: 14px;">Куда публикуем?</label>
+            <select id="publish-category">
+                <option value="news">Жаңалықтар (В ленту новостей)</option>
+                <option value="about">Колледж Туралы (О колледже)</option>
+                <option value="entrants">Талапкерге (Абитуриентам)</option>
+                <option value="students">Студентке (Студентам)</option>
+            </select>
+
+            <input type="text" id="news-title" placeholder="Заголовок">
+            <textarea id="news-text" rows="5" placeholder="Основной текст"></textarea>
+            
+            <label style="font-size: 14px; font-weight: bold; margin-bottom: 5px; display: block;">Прикрепить фото (если нужно):</label>
             <input type="file" id="news-image" accept="image/*">
+            
             <button id="publish-btn" onclick="publishNews()">Опубликовать</button>
             <p id="publish-status" style="font-weight: bold; margin-bottom: 0;"></p>
         </div>
@@ -97,15 +117,14 @@
 
     <!-- Логика сайта (Бэкенд) -->
     <script>
-        // Твои рабочие ключи
-        const dbUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news.json";
+        const baseUrl = "https://qzomedicalcollege-default-rtdb.firebaseio.com/";
         const imgbbKey = "582a59fe4c572868e41343f804672210";
 
-        // Функция вывода новостей
+        // Загружаем только новости на главной странице
         async function loadNews() {
             const container = document.getElementById("news-container");
             try {
-                let response = await fetch(dbUrl);
+                let response = await fetch(baseUrl + "news.json");
                 let data = await response.json();
                 
                 container.innerHTML = "";
@@ -115,7 +134,6 @@
                     return;
                 }
 
-                // Преобразуем данные в массив и переворачиваем (чтобы новые были сверху)
                 let newsArray = Object.values(data).reverse();
                 
                 newsArray.forEach(news => {
@@ -125,17 +143,17 @@
                     div.innerHTML = `
                         <h3 style="margin-bottom: 5px;">${news.title}</h3>
                         <small style="color: #888; display: block; margin-bottom: 10px;">${news.date}</small>
-                        <p style="line-height: 1.5;">${news.text}</p>
+                        <p style="line-height: 1.5; white-space: pre-wrap;">${news.text}</p>
                         ${imgHtml}
                     `;
                     container.appendChild(div);
                 });
             } catch (e) {
-                container.innerHTML = "<p style='color: red;'>Ошибка загрузки новостей</p>";
+                container.innerHTML = "<p style='color: red;'>Ошибка загрузки базы данных</p>";
             }
         }
 
-        // Проверка логина
+        // Проверка логина (admin/admin)
         document.getElementById("show-login-btn").onclick = () => {
             document.getElementById("login-panel").style.display = "block";
         };
@@ -153,8 +171,9 @@
             }
         }
 
-        // Публикация
+        // Универсальная функция публикации
         async function publishNews() {
+            const category = document.getElementById("publish-category").value;
             const title = document.getElementById("news-title").value;
             const text = document.getElementById("news-text").value;
             const fileInput = document.getElementById("news-image");
@@ -174,7 +193,7 @@
             try {
                 let imageUrl = "";
                 
-                // Загружаем фото на ImgBB, если оно выбрано
+                // Загрузка фото на ImgBB
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
                     formData.append("image", fileInput.files);
@@ -188,11 +207,11 @@
                     if (imgResult.success) {
                         imageUrl = imgResult.data.url;
                     } else {
-                        throw new Error("Ошибка загрузки картинки");
+                        throw new Error("Ошибка загрузки картинки на сервер");
                     }
                 }
 
-                // Отправляем текст в базу данных Firebase
+                // Формируем данные
                 let newPost = {
                     title: title,
                     text: text,
@@ -200,26 +219,29 @@
                     date: new Date().toLocaleString("ru-RU")
                 };
 
-                let dbResponse = await fetch(dbUrl, {
+                // Отправляем в выбранную категорию базы данных
+                let dbResponse = await fetch(baseUrl + category + ".json", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(newPost)
                 });
 
                 if (!dbResponse.ok) {
-                    throw new Error("Сбой базы данных");
+                    throw new Error("База данных отклонила запрос");
                 }
 
                 status.style.color = "green";
-                status.innerText = "Жаңалық сәтті жарияланды! (Успешно)";
+                status.innerText = "Сәтті жарияланды! (Успешно опубликовано)";
                 
                 // Очищаем форму
                 document.getElementById("news-title").value = "";
                 document.getElementById("news-text").value = "";
                 fileInput.value = "";
                 
-                // Перезагружаем ленту новостей
-                loadNews();
+                // Если публиковали новость - сразу обновляем ленту
+                if(category === "news") {
+                    loadNews();
+                }
 
             } catch (e) {
                 status.style.color = "red";
@@ -230,7 +252,7 @@
             btn.disabled = false;
         }
 
-        // Запуск при открытии
+        // Загружаем новости при открытии сайта
         loadNews();
     </script>
 </body>
