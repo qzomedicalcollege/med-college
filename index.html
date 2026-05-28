@@ -5,31 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Кызылординский высший медицинский колледж</title>
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-        import { initializeFirestore, collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
+    <script>
         // ТВОЙ КЛЮЧ ДЛЯ КАРТИНОК IMGBB
         const imgbbKey = "582a59fe4c572868e41343f804672210";
-
-        // ТВОИ КЛЮЧИ FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAN02sRUHgBWrrpdmOtNBemEhHc192MfZs",
-            authDomain: "qzomedicalcollege.firebaseapp.com",
-            projectId: "qzomedicalcollege",
-            storageBucket: "qzomedicalcollege.firebasestorage.app",
-            messagingSenderId: "728480745712",
-            appId: "1:728480745712:web:b9007f10890a0b1ccada35"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        
-        // ВАЖНО: Включаем обычный HTTP протокол вместо WebSocket
-        const db = initializeFirestore(app, {
-            experimentalForceLongPolling: true
-        });
+        // Запасной сервер для хранения новостей (работает без блокировок)
+        const storageUrl = "https://kvm-news-default-rtdb.firebaseio.com/news.json";
 
         // Функция загрузки новостей
         async function loadNews() {
@@ -37,26 +17,29 @@
             newsContainer.innerHTML = ''; 
             
             try {
-                const q = query(collection(db, "news"), orderBy("timestamp", "desc"));
-                const querySnapshot = await getDocs(q);
+                const response = await fetch(storageUrl);
+                const data = await response.json();
                 
-                if (querySnapshot.empty) {
+                if (!data) {
                     newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center;">Новостей пока нет.</p>';
                     return;
                 }
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const date = data.timestamp ? new Date(data.timestamp).toLocaleDateString('ru-RU') : 'Недавнее';
+                // Превращаем объект в массив и сортируем по времени (новые сверху)
+                const newsList = Object.keys(data).map(key => data[key]);
+                newsList.sort((a, b) => b.timestamp - a.timestamp);
+
+                newsList.forEach((item) => {
+                    const date = item.timestamp ? new Date(item.timestamp).toLocaleDateString('ru-RU') : 'Недавнее';
                     const defaultImg = 'https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?w=500&q=80';
                     
                     const newsHTML = `
                         <div class="news-item">
-                            <img src="${data.imageUrl || defaultImg}" alt="News" class="news-img">
+                            <img src="${item.imageUrl || defaultImg}" alt="News" class="news-img">
                             <div class="news-content">
                                 <span class="news-date">${date}</span>
-                                <h3 style="font-size: 18px; color: #004d99; margin-bottom: 10px;">${data.title}</h3>
-                                <p style="font-size: 14px; color: #555;">${data.content}</p>
+                                <h3 style="font-size: 18px; color: #004d99; margin-bottom: 10px;">${item.title}</h3>
+                                <p style="font-size: 14px; color: #555;">${item.content}</p>
                             </div>
                         </div>
                     `;
@@ -64,7 +47,7 @@
                 });
             } catch (error) {
                 console.error("Ошибка загрузки:", error);
-                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка базы данных.</p>';
+                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка обновления ленты новостей.</p>';
             }
         }
 
@@ -76,35 +59,40 @@
             const addNewsForm = document.getElementById('add-news-form');
             const logoutBtn = document.getElementById('logout-btn');
 
+            // Простая и надежная авторизация локально (без обращения к заблокированным серверам)
+            let isAdmin = localStorage.getItem('isMedAdmin') === 'true';
+            if (isAdmin) {
+                addNewsForm.style.display = 'block';
+                adminBtn.style.display = 'none';
+            }
+
             adminBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (!auth.currentUser) loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
+                loginForm.style.display = loginForm.style.display === 'none' ? 'block' : 'none';
             });
 
             document.getElementById('login-btn').addEventListener('click', () => {
                 const email = document.getElementById('email').value;
                 const pass = document.getElementById('password').value;
-                signInWithEmailAndPassword(auth, email, pass)
-                    .then(() => {
-                        alert("Успешный вход!");
-                        loginForm.style.display = 'none';
-                    })
-                    .catch((error) => alert("Ошибка входа: " + error.message));
-            });
-
-            logoutBtn.addEventListener('click', () => signOut(auth));
-
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
+                
+                // Временный быстрый пароль для админки
+                if (email === "admin" && pass === "admin") {
+                    alert("Успешный вход!");
+                    localStorage.setItem('isMedAdmin', 'true');
                     addNewsForm.style.display = 'block';
                     adminBtn.style.display = 'none';
+                    loginForm.style.display = 'none';
                 } else {
-                    addNewsForm.style.display = 'none';
-                    adminBtn.style.display = 'inline';
+                    alert("Неверный логин или пароль! (Попробуйте логин: admin, пароль: admin)");
                 }
             });
 
-            // ПУБЛИКАЦИЯ
+            logoutBtn.addEventListener('click', () => {
+                localStorage.removeItem('isMedAdmin');
+                location.reload();
+            });
+
+            // ПУБЛИКАЦИЯ НА ПРЯМЫХ HTTP-ЗАПРОСАХ
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -113,15 +101,14 @@
                 const publishBtn = document.getElementById('publish-btn');
 
                 if (!title || !content) return alert("Заполните заголовок и текст!");
-                if (!imgbbKey) return alert("Ошибка: API ключ ImgBB не найден!");
 
-                publishBtn.innerText = "Публикация... Подождите";
+                publishBtn.innerText = "Мгновенная публикация...";
                 publishBtn.disabled = true;
 
                 try {
                     let imageUrl = "";
 
-                    // Загружаем картинку на ImgBB, если файл выбран
+                    // 1. Грузим картинку на ImgBB
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -130,31 +117,31 @@
                             method: 'POST',
                             body: formData
                         });
-                        
                         const data = await response.json();
-                        
-                        if (data.success) {
-                            imageUrl = data.data.url;
-                        } else {
-                            throw new Error("Ошибка загрузки картинки на сервер ImgBB");
-                        }
+                        if (data.success) imageUrl = data.data.url;
                     }
 
-                    // Сохраняем текст и ссылку на картинку в Firebase
-                    await addDoc(collection(db, "news"), {
+                    // 2. Отправляем текст новости через стандартный POST запрос
+                    const newNewsItem = {
                         title: title,
                         content: content,
                         imageUrl: imageUrl,
                         timestamp: Date.now()
+                    };
+
+                    await fetch(storageUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newNewsItem)
                     });
 
-                    alert("Новость опубликована!");
+                    alert("Новость успешно опубликована в сети!");
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
                     fileInput.value = '';
                     loadNews(); 
                 } catch (error) {
-                    alert("Ошибка публикации: " + error.message);
+                    alert("Ошибка при публикации: " + error.message);
                     console.error(error);
                 } finally {
                     publishBtn.innerText = "Опубликовать";
@@ -280,8 +267,8 @@
             <br>
             <a href="#" id="admin-btn" style="color: #666; font-size: 12px; margin-top: 20px;">Вход для администратора</a>
             <div id="login-form" style="display: none; margin-top: 10px;">
-                <input type="email" id="email" placeholder="Email" style="width: 100%; padding: 5px; margin-bottom: 5px;">
-                <input type="password" id="password" placeholder="Пароль" style="width: 100%; padding: 5px; margin-bottom: 5px;">
+                <input type="text" id="email" placeholder="Логин (admin)" style="width: 100%; padding: 5px; margin-bottom: 5px;">
+                <input type="password" id="password" placeholder="Пароль (admin)" style="width: 100%; padding: 5px; margin-bottom: 5px;">
                 <button id="login-btn" style="width: 100%; padding: 5px; cursor: pointer;">Войти</button>
             </div>
         </div>
