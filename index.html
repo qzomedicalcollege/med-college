@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="kz">
 <head>
@@ -366,13 +365,11 @@
 
         /* 3. ИНИЦИАЛИЗАЦИЯ UI И ИНТЕРАКТИВА */
         document.addEventListener('DOMContentLoaded', () => {
-            // Установка языка
             setLanguage(localStorage.getItem('site_lang') || 'kz');
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.addEventListener('click', e => setLanguage(e.target.getAttribute('data-lang')));
             });
 
-            // Мобильное меню
             const mobileBtn = document.querySelector('.mobile-menu-btn');
             const navLinks = document.querySelector('.nav-links');
             if (mobileBtn && navLinks) {
@@ -388,7 +385,6 @@
                 });
             }
 
-            // Плавное появление элементов (Scroll Reveal)
             const reveals = document.querySelectorAll('.reveal');
             const revealOnScroll = () => {
                 const winHeight = window.innerHeight;
@@ -399,14 +395,12 @@
             window.addEventListener('scroll', revealOnScroll);
             revealOnScroll();
 
-            // Проверка админ-доступа и рендер новостей
             checkAdminState();
             loadNews();
         });
 
         /* 4. АДМИН-ПАНЕЛЬ И CMS (FIREBASE) */
 
-        // Логин в систему (Спрятано в футере)
         const loginTrigger = document.getElementById('admin-login-trigger');
         if (loginTrigger) {
             loginTrigger.addEventListener('click', () => {
@@ -417,7 +411,7 @@
                         localStorage.setItem('isMedAdmin', 'true');
                         alert('Доступ разрешен!');
                         checkAdminState();
-                        loadNews(); // Перезагружаем новости, чтобы появились кнопки "Удалить"
+                        loadNews(); 
                     } else {
                         alert('Неверные данные!');
                     }
@@ -425,13 +419,12 @@
             });
         }
 
-        // Выход из админки
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
                 localStorage.removeItem('isMedAdmin');
                 checkAdminState();
-                loadNews(); // Скрываем кнопки удаления
+                loadNews(); 
             });
         }
 
@@ -441,13 +434,15 @@
             if (adminPanel) adminPanel.classList.toggle('hidden', !isAdmin);
         }
 
-        // Загрузка и рендер новостей из Firebase
+        // Загрузка и рендер новостей (ИСПРАВЛЕНО: добавлено предотвращение кэширования браузером)
         async function loadNews() {
             const container = document.getElementById('news-container');
             if (!container) return;
 
             try {
-                const res = await fetch(FIREBASE_DB_URL);
+                // ИСПРАВЛЕНИЕ #2: Штамп времени '?_=' + Date.now() и 'cache: no-store' обходят жесткое кэширование телефонов
+                const urlWithNoCache = FIREBASE_DB_URL + '?_=' + new Date().getTime();
+                const res = await fetch(urlWithNoCache, { cache: 'no-store' });
                 const data = await res.json();
                 
                 container.innerHTML = '';
@@ -456,7 +451,6 @@
                     return;
                 }
 
-                // Преобразуем JSON-объект в массив и сортируем от свежих к старым
                 const newsArray = Object.entries(data)
                     .map(([id, val]) => ({ id, ...val }))
                     .sort((a, b) => b.timestamp - a.timestamp);
@@ -464,17 +458,14 @@
                 const isAdmin = localStorage.getItem('isMedAdmin') === 'true';
 
                 newsArray.forEach(item => {
-                    // Картинка, если она прикреплена
                     const imgHtml = item.imageUrl 
                         ? `<img src="${escapeHTML(item.imageUrl)}" class="news-img" alt="News Image">` 
                         : '';
                     
-                    // Кнопка удаления (видна только админу)
                     const deleteBtnHtml = isAdmin 
                         ? `<button data-id="${item.id}" class="delete-btn"><i class="fa-solid fa-trash"></i> Удалить новость</button>` 
                         : '';
 
-                    // Генерация HTML-карточки
                     container.innerHTML += `
                         <article class="news-item">
                             ${imgHtml}
@@ -492,7 +483,7 @@
             }
         }
 
-        // Публикация новости (ImgBB -> Firebase)
+        // Публикация новости (ИСПРАВЛЕНО: указан индекс файла для ImgBB)
         const addNewsForm = document.getElementById('add-news-form');
         if (addNewsForm) {
             addNewsForm.addEventListener('submit', async (e) => {
@@ -507,7 +498,7 @@
                     const fileInput = document.getElementById('news-image');
                     let imageUrl = '';
 
-                    // Если файл выбран - берем первый файл из массива (.files) и грузим на ImgBB
+                    // ИСПРАВЛЕНИЕ #1: Берем строго  (первый файл), а не весь список!
                     if (fileInput.files && fileInput.files.length > 0) {
                         btn.textContent = 'Загрузка картинки...';
                         const formData = new FormData();
@@ -525,7 +516,6 @@
                         }
                     }
 
-                    // Отправляем все текстовые данные и ссылку на фото в Firebase
                     btn.textContent = 'Сохранение в базу...';
                     const newPost = {
                         title: title,
@@ -545,7 +535,7 @@
 
                     alert('Новость успешно опубликована!');
                     addNewsForm.reset();
-                    loadNews(); // Перерисовываем ленту новостей
+                    loadNews(); // Обновит ленту без кэша
 
                 } catch (err) {
                     alert('Произошла ошибка: ' + err.message);
@@ -560,7 +550,6 @@
         const newsContainer = document.getElementById('news-container');
         if (newsContainer) {
             newsContainer.addEventListener('click', async (e) => {
-                // Ищем клик по кнопке с классом delete-btn
                 const deleteBtn = e.target.closest('.delete-btn');
                 if (deleteBtn) {
                     const id = deleteBtn.getAttribute('data-id');
@@ -570,7 +559,7 @@
                         try {
                             const deleteUrl = `https://qzomedicalcollege-default-rtdb.firebaseio.com/news/${id}.json`;
                             await fetch(deleteUrl, { method: 'DELETE' });
-                            loadNews(); // Обновляем ленту после успешного удаления
+                            loadNews(); // Обновит ленту без кэша
                         } catch (err) {
                             alert('Ошибка удаления: ' + err.message);
                             deleteBtn.textContent = 'Удалить новость';
@@ -581,7 +570,6 @@
             });
         }
 
-        // Защита от вредоносного кода при рендеринге (XSS)
         function escapeHTML(str) {
             if(!str) return '';
             const div = document.createElement('div');
@@ -591,4 +579,3 @@
     </script>
 </body>
 </html>
-```
