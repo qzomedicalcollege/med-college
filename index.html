@@ -6,10 +6,12 @@
     <title>Кызылординский высший медицинский колледж</title>
     
     <script>
-        // Твой ключ ImgBB
+        // Твой ключ ImgBB для картинок
         const imgbbKey = "582a59fe4c572868e41343f804672210";
-        // Прямая ссылка на твою базу данных Firebase (Firestore REST API)
-        const firestoreUrl = "https://firestore.googleapis.com/v1/projects/qzomedicalcollege/databases/(default)/documents/news";
+        // Твой ключ Firebase для авторизации запросов к базе
+        const firebaseApiKey = "AIzaSyAN02sRUHgBWrrpdmOtNBemEhHc192MfZs";
+        // Ссылка на базу данных С ОБЯЗАТЕЛЬНЫМ ключом для Google индентификации
+        const firestoreUrl = `https://firestore.googleapis.com/v1/projects/qzomedicalcollege/databases/(default)/documents/news?key=${firebaseApiKey}`;
 
         // Загрузка новостей
         async function loadNews() {
@@ -18,6 +20,12 @@
             
             try {
                 const response = await fetch(firestoreUrl);
+                
+                if (!response.ok) {
+                    const errData = await response.json();
+                    throw new Error(errData.error?.message || "Не удалось прочитать базу данных");
+                }
+                
                 const data = await response.json();
                 
                 if (!data.documents) {
@@ -25,7 +33,6 @@
                     return;
                 }
 
-                // Преобразуем сложные данные Firestore в удобный массив
                 let newsList = data.documents.map(doc => {
                     const fields = doc.fields || {};
                     return {
@@ -36,11 +43,10 @@
                     };
                 });
 
-                // Сортируем: новые сверху
+                // Сортировка: новые сверху
                 newsList.sort((a, b) => b.timestamp - a.timestamp);
 
                 newsList.forEach((item) => {
-                    // Если даты нет, пишем "Недавнее"
                     const date = item.timestamp ? new Date(item.timestamp).toLocaleDateString('ru-RU') : 'Недавнее';
                     const defaultImg = 'https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?w=500&q=80';
                     const finalImg = item.imageUrl ? item.imageUrl : defaultImg;
@@ -59,7 +65,7 @@
                 });
             } catch (error) {
                 console.error("Ошибка загрузки:", error);
-                newsContainer.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка подключения к базе данных.</p>';
+                newsContainer.innerHTML = `<p style="grid-column: 1 / -1; text-align: center; color: red;">Ошибка: ${error.message}</p>`;
             }
         }
 
@@ -102,7 +108,7 @@
                 location.reload();
             });
 
-            // ПУБЛИКАЦИЯ
+            // ПУБЛИКАЦИЯ С ЖЕСТКИМ КОНТРОЛЕМ ОШИБОК СЕРВЕРА
             document.getElementById('publish-btn').addEventListener('click', async () => {
                 const title = document.getElementById('news-title').value;
                 const content = document.getElementById('news-content').value;
@@ -118,7 +124,7 @@
                 try {
                     let imageUrl = "";
 
-                    // Загружаем картинку на ImgBB
+                    // 1. Загрузка картинки на ImgBB
                     if (file) {
                         const formData = new FormData();
                         formData.append('image', file);
@@ -131,7 +137,7 @@
                         if (data.success) imageUrl = data.data.url;
                     }
 
-                    // Формируем структуру данных для Firestore REST API
+                    // 2. Формирование структуры документа для Firestore REST API
                     const newDoc = {
                         fields: {
                             title: { stringValue: title },
@@ -141,20 +147,29 @@
                         }
                     };
 
-                    // Отправляем в ТВОЮ базу
-                    await fetch(firestoreUrl, {
+                    // 3. Отправка в базу данных
+                    const response = await fetch(firestoreUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(newDoc)
                     });
 
-                    alert("Новость успешно опубликована!");
+                    // ПРОДВИНУТАЯ ПРОВЕРКА ОТВЕТА GOOGLE СЕРВЕРА
+                    if (!response.ok) {
+                        const errData = await response.json();
+                        // Если сервер вернул ошибку, принудительно прерываем скрипт и выводим её текст
+                        throw new Error(errData.error?.message || "База данных отклонила запрос");
+                    }
+
+                    alert("Новость успешно сохранена в базу данных!");
                     document.getElementById('news-title').value = '';
                     document.getElementById('news-content').value = '';
                     fileInput.value = '';
-                    loadNews(); 
+                    loadNews(); // Перезагружаем ленту новостей
                 } catch (error) {
+                    // Теперь здесь покажется реальная причина блокировки
                     alert("Ошибка публикации: " + error.message);
+                    console.error(error);
                 } finally {
                     publishBtn.innerText = "Опубликовать";
                     publishBtn.disabled = false;
