@@ -1,52 +1,68 @@
+```html
 <!DOCTYPE html>
 <html lang="kz">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Қызылорда жоғары медициналық колледжі</title>
-    <!-- Подключение современного шрифта Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
+    <!-- Шрифты и иконки -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- CSS Стили -->
     <style>
-        /* Базовые стили и переменные */
+        /* ==========================================
+           Базовые переменные и настройки
+           ========================================== */
         :root {
             --primary-color: #0056b3;
-            --text-dark: #333333;
+            --primary-hover: #004494;
+            --secondary-color: #e3f2fd;
+            --text-dark: #2d3748;
+            --text-light: #718096;
             --bg-light: #ffffff;
-            --bg-gray: #f8f9fa;
-            --transition: all 0.3s ease;
+            --bg-gray: #f7fafc;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow: 0 10px 25px rgba(0, 86, 179, 0.08);
+            --border-radius: 12px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html { scroll-behavior: smooth; }
 
         body {
             font-family: 'Inter', sans-serif;
             color: var(--text-dark);
             background-color: var(--bg-gray);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        /* 1. Header (Шапка) и Меню */
-        header {
-            background-color: var(--bg-light);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 20px;
+        }
+
+        /* ==========================================
+           1. Header (Шапка и Меню)
+           ========================================== */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -57,173 +73,550 @@
             font-size: 24px;
             font-weight: 800;
             color: var(--primary-color);
-        }
-
-        nav ul {
             display: flex;
-            list-style: none;
-            gap: 30px;
+            align-items: center;
+            gap: 10px;
         }
 
-        nav ul li a {
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            align-items: center;
+        }
+
+        .nav-links a {
             font-weight: 600;
+            font-size: 15px;
+            color: var(--text-dark);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px; left: 0;
+            width: 0; height: 2px;
+            background-color: var(--primary-color);
             transition: var(--transition);
         }
 
-        nav ul li a:hover {
-            color: var(--primary-color);
-        }
+        .nav-links a:hover { color: var(--primary-color); }
+        .nav-links a:hover::after { width: 100%; }
 
-        /* 2. Переключатель языков (Кнопки) */
+        /* Переключатель языков */
         .lang-switcher {
             display: flex;
             gap: 5px;
             background: var(--bg-gray);
-            padding: 5px;
+            padding: 4px;
             border-radius: 8px;
+            border: 1px solid #e2e8f0;
         }
 
         .lang-btn {
             background: transparent;
             border: none;
             padding: 6px 12px;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            border-radius: 5px;
-            color: var(--text-dark);
+            border-radius: 6px;
+            color: var(--text-light);
             transition: var(--transition);
         }
 
         .lang-btn.active {
             background: var(--primary-color);
             color: #fff;
+            box-shadow: 0 2px 5px rgba(0,86,179,0.2);
         }
 
-        .lang-btn:hover:not(.active) {
-            background: #e2e6ea;
+        .lang-btn:hover:not(.active) { color: var(--text-dark); }
+
+        .mobile-menu-btn {
+            display: none;
+            font-size: 24px;
+            color: var(--primary-color);
+            cursor: pointer;
         }
 
-        /* 3. Главный экран (Hero Section) */
-        #hero {
+        /* ==========================================
+           2. Hero Section (Главный экран)
+           ========================================== */
+        #home {
+            padding: 160px 20px 100px;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--bg-light) 100%);
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             text-align: center;
-            height: calc(100vh - 80px);
-            background: linear-gradient(135deg, #e3f2fd 0%, var(--bg-light) 100%);
-            padding: 0 20px;
         }
 
-        #hero h1 {
-            font-size: 48px;
+        .hero-content { max-width: 900px; }
+
+        .hero-title {
+            font-size: 52px;
             font-weight: 800;
             color: var(--primary-color);
-            max-width: 900px;
+            margin-bottom: 25px;
             line-height: 1.2;
         }
 
-        /* Адаптивность для мобильных устройств */
-        @media (max-width: 768px) {
-            .container {
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-primary {
+            display: inline-block;
+            padding: 16px 40px;
+            background-color: var(--primary-color);
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: transparent;
+            color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        /* ==========================================
+           3. Общие стили секций (О нас, Студентам, Новости)
+           ========================================== */
+        section { padding: 100px 20px; }
+        
+        section:nth-child(even) { background-color: var(--bg-light); }
+
+        .section-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 60px;
+            color: var(--text-dark);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background-color: var(--bg-light);
+            padding: 40px 30px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+            border-color: transparent;
+        }
+
+        .card-icon {
+            font-size: 45px;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+        }
+
+        .card h3 { font-size: 22px; margin-bottom: 15px; }
+        .card p { color: var(--text-light); font-size: 15px; }
+
+        /* Простые информационные блоки */
+        .info-block {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 40px;
+            background: #fff;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        /* ==========================================
+           4. Contact (Абитуриентам / Контакты)
+           ========================================== */
+        .contact-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 50px;
+        }
+
+        .contact-info, .contact-form { flex: 1; min-width: 300px; }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .info-icon {
+            width: 60px; height: 60px;
+            background: var(--secondary-color);
+            color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .info-text h4 { font-size: 18px; margin-bottom: 5px; }
+        .info-text p { color: var(--text-light); }
+
+        form {
+            background: #fff;
+            padding: 40px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 86, 179, 0.1);
+        }
+
+        .form-group textarea { height: 150px; resize: vertical; }
+
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-submit:hover { background-color: var(--primary-hover); }
+
+        /* ==========================================
+           5. Footer (Подвал)
+           ========================================== */
+        footer {
+            background-color: #1a202c;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-links a {
+            width: 45px; height: 45px;
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background-color: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright { color: #a0aec0; font-size: 14px; }
+
+        /* ==========================================
+           Анимации появления при скролле
+           ========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ==========================================
+           Адаптивность (Медиазапросы)
+           ========================================== */
+        @media (max-width: 992px) {
+            .nav-links {
+                position: fixed;
+                top: 80px; right: -100%;
+                width: 100%; height: calc(100vh - 80px);
+                background-color: rgba(255, 255, 255, 0.98);
                 flex-direction: column;
-                height: auto;
-                padding: 15px 20px;
-                gap: 15px;
-            }
-            nav ul {
-                flex-wrap: wrap;
                 justify-content: center;
-                gap: 15px;
+                transition: right 0.4s ease;
             }
-            #hero h1 {
-                font-size: 32px;
-            }
+            .nav-links.active { right: 0; }
+            .mobile-menu-btn { display: block; }
+            .hero-title { font-size: 36px; }
+            .lang-switcher { margin-top: 20px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. Header (Шапка) -->
+    <!-- 1. Header (Шапка и Меню) -->
     <header>
-        <div class="container">
-            <div class="logo">ВМК</div>
+        <div class="container navbar">
+            <a href="#home" class="logo">
+                <i class="fa-solid fa-staff-snake"></i> ВМК
+            </a>
             
-            <!-- Навигационное меню -->
             <nav>
-                <ul>
+                <ul class="nav-links">
+                    <li><a href="#home" data-i18n="nav-home">Басты бет</a></li>
                     <li><a href="#about" data-i18n="nav-about">Колледж туралы</a></li>
-                    <li><a href="#specialties" data-i18n="nav-specialties">Мамандықтар</a></li>
-                    <li><a href="#applicants" data-i18n="nav-applicants">Талапкерлерге</a></li>
-                    <li><a href="#contacts" data-i18n="nav-contacts">Байланыстар</a></li>
+                    <li><a href="#applicant" data-i18n="nav-applicant">Талапкерге</a></li>
+                    <li><a href="#student" data-i18n="nav-student">Студентке</a></li>
+                    <li><a href="#news" data-i18n="nav-news">Жаңалықтар</a></li>
+                    
+                    <!-- Переключатель языков внутри меню для мобильных -->
+                    <li>
+                        <div class="lang-switcher">
+                            <button class="lang-btn" data-lang="kz">KZ</button>
+                            <button class="lang-btn" data-lang="ru">RU</button>
+                            <button class="lang-btn" data-lang="en">EN</button>
+                        </div>
+                    </li>
                 </ul>
             </nav>
 
-            <!-- 2. Переключатель языков -->
-            <div class="lang-switcher">
-                <button class="lang-btn" data-lang="kz">KZ</button>
-                <button class="lang-btn" data-lang="ru">RU</button>
-                <button class="lang-btn" data-lang="en">EN</button>
+            <div class="mobile-menu-btn">
+                <i class="fa-solid fa-bars"></i>
             </div>
         </div>
     </header>
 
-    <!-- 3. Главный экран (Hero Section) -->
     <main>
-        <section id="hero">
-            <h1 data-i18n="hero-title">Қызылорда жоғары медициналық колледжі</h1>
+        <!-- 2. Главный экран (Hero Section) -->
+        <section id="home">
+            <div class="container hero-content reveal">
+                <h1 class="hero-title" data-i18n="hero-title">Қызылорда жоғары медициналық колледжі</h1>
+                <p class="hero-subtitle" data-i18n="hero-subtitle">Заманауи технологиялар мен тәжірибелі оқытушылар негізінде сапалы медициналық білім алыңыз.</p>
+                <a href="#applicant" class="btn-primary" data-i18n="hero-btn">Құжаттарды тапсыру</a>
+            </div>
+        </section>
+
+        <!-- 3. О колледже / Специальности -->
+        <section id="about">
+            <div class="container">
+                <h2 class="section-title reveal" data-i18n="about-title">Біздің мамандықтар</h2>
+                <div class="features-grid">
+                    <div class="card reveal">
+                        <i class="fa-solid fa-user-nurse card-icon"></i>
+                        <h3 data-i18n="card-1-title">Мейіргер ісі</h3>
+                        <p data-i18n="card-1-desc">Халықаралық стандарттарға сай мейіргерлерді даярлау.</p>
+                    </div>
+                    <div class="card reveal">
+                        <i class="fa-solid fa-briefcase-medical card-icon"></i>
+                        <h3 data-i18n="card-2-title">Емдеу ісі</h3>
+                        <p data-i18n="card-2-desc">Жедел жәрдем және емханалар үшін фельдшерлерді даярлау.</p>
+                    </div>
+                    <div class="card reveal">
+                        <i class="fa-solid fa-pills card-icon"></i>
+                        <h3 data-i18n="card-3-title">Фармация</h3>
+                        <p data-i18n="card-3-desc">Заманауи дәрі-дәрмектерді жасау және сақтау ережелері.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Абитуриентам (Форма и контакты) -->
+        <section id="applicant">
+            <div class="container">
+                <h2 class="section-title reveal" data-i18n="applicant-title">Талапкерлерге (Байланыс)</h2>
+                <div class="contact-wrapper">
+                    <div class="contact-info reveal">
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="info-text">
+                                <h4 data-i18n="contact-address-title">Біздің мекенжай</h4>
+                                <p data-i18n="contact-address">Қызылорда қ., Ы.Жахаев көш. 18</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                            <div class="info-text">
+                                <h4 data-i18n="contact-phone-title">Қабылдау комиссиясы</h4>
+                                <p>+7 7242 23-05-13</p>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div class="info-text">
+                                <h4>Email</h4>
+                                <p>kzmediccollege@mail.kz</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="contact-form reveal">
+                        <form id="contactForm">
+                            <div class="form-group">
+                                <input type="text" data-i18n-placeholder="form-name" placeholder="Атыңыз" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" data-i18n-placeholder="form-email" placeholder="Электронды поштаңыз" required>
+                            </div>
+                            <div class="form-group">
+                                <textarea data-i18n-placeholder="form-msg" placeholder="Хабарламаңыз" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit" data-i18n="form-submit">Өтініш жіберу</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Студентам (Инфо-блок) -->
+        <section id="student">
+            <div class="container reveal">
+                <h2 class="section-title" data-i18n="nav-student">Студентке</h2>
+                <div class="info-block">
+                    <i class="fa-solid fa-graduation-cap card-icon"></i>
+                    <h3 data-i18n="student-title" style="font-size: 24px; margin-bottom: 15px;">Студентке арналған ақпарат</h3>
+                    <p data-i18n="student-desc" style="color: var(--text-light);">Сабақ кестесі, оқу материалдары және студенттік өмір.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Новости (Инфо-блок) -->
+        <section id="news">
+            <div class="container reveal">
+                <h2 class="section-title" data-i18n="nav-news">Жаңалықтар</h2>
+                <div class="info-block">
+                    <i class="fa-regular fa-newspaper card-icon"></i>
+                    <h3 data-i18n="news-title" style="font-size: 24px; margin-bottom: 15px;">Соңғы жаңалықтар</h3>
+                    <p data-i18n="news-desc" style="color: var(--text-light);">Колледж өміріндегі маңызды оқиғалар мен хабарландырулар.</p>
+                </div>
+            </div>
         </section>
     </main>
 
-    <!-- 4. JavaScript Логика (Мультиязычность) -->
+    <!-- 7. Footer (Подвал) -->
+    <footer>
+        <div class="container">
+            <div class="social-links">
+                <a href="#"><i class="fa-brands fa-telegram"></i></a>
+                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="#"><i class="fa-brands fa-vk"></i></a>
+            </div>
+            <p class="copyright">&copy; 2026 ВМК. Барлық құқықтар қорғалған.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Логика -->
     <script>
-        // Объект со словарями переводов
+        // ==========================================
+        // Словарь переводов (Мультиязычность)
+        // ==========================================
         const translations = {
-            'nav-about': {
-                kz: "Колледж туралы",
-                ru: "О колледже",
-                en: "About College"
+            // Навигация
+            'nav-home': { kz: "Басты бет", ru: "Главная", en: "Home" },
+            'nav-about': { kz: "Колледж туралы", ru: "О колледже", en: "About College" },
+            'nav-applicant': { kz: "Талапкерге", ru: "Абитуриентам", en: "For Applicants" },
+            'nav-student': { kz: "Студентке", ru: "Студентам", en: "For Students" },
+            'nav-news': { kz: "Жаңалықтар", ru: "Новости", en: "News" },
+            
+            // Главный экран
+            'hero-title': { 
+                kz: "Қызылорда жоғары медициналық колледжі", 
+                ru: "Кызылординский высший медицинский колледж", 
+                en: "Kyzylorda Higher Medical College" 
             },
-            'nav-specialties': {
-                kz: "Мамандықтар",
-                ru: "Специальности",
-                en: "Specialties"
+            'hero-subtitle': { 
+                kz: "Заманауи технологиялар мен тәжірибелі оқытушылар негізінде сапалы медициналық білім алыңыз.", 
+                ru: "Получите качественное медицинское образование на базе современных технологий и опытных преподавателей.", 
+                en: "Get quality medical education based on modern technologies and experienced teachers." 
             },
-            'nav-applicants': {
-                kz: "Талапкерлерге",
-                ru: "Абитуриентам",
-                en: "For Applicants"
-            },
-            'nav-contacts': {
-                kz: "Байланыстар",
-                ru: "Контакты",
-                en: "Contacts"
-            },
-            'hero-title': {
-                kz: "Қызылорда жоғары медициналық колледжі",
-                ru: "Кызылординский высший медицинский колледж",
-                en: "Kyzylorda Higher Medical College"
-            }
+            'hero-btn': { kz: "Құжаттарды тапсыру", ru: "Подать документы", en: "Apply Now" },
+
+            // Секция "О колледже"
+            'about-title': { kz: "Біздің мамандықтар", ru: "Наши специальности", en: "Our Specialties" },
+            'card-1-title': { kz: "Мейіргер ісі", ru: "Сестринское дело", en: "Nursing" },
+            'card-1-desc': { kz: "Халықаралық стандарттарға сай мейіргерлерді даярлау.", ru: "Подготовка медицинских сестер по международным стандартам.", en: "Training of nurses according to international standards." },
+            'card-2-title': { kz: "Емдеу ісі", ru: "Лечебное дело", en: "General Medicine" },
+            'card-2-desc': { kz: "Жедел жәрдем және емханалар үшін фельдшерлерді даярлау.", ru: "Подготовка фельдшеров для скорой помощи и поликлиник.", en: "Training paramedics for ambulances and clinics." },
+            'card-3-title': { kz: "Фармация", ru: "Фармация", en: "Pharmacy" },
+            'card-3-desc': { kz: "Заманауи дәрі-дәрмектерді жасау және сақтау ережелері.", ru: "Изготовление и правила хранения современных лекарств.", en: "Manufacturing and storage rules for modern medicines." },
+
+            // Секция "Абитуриентам / Контакты"
+            'applicant-title': { kz: "Талапкерлерге (Байланыс)", ru: "Абитуриентам (Контакты)", en: "For Applicants (Contacts)" },
+            'contact-address-title': { kz: "Біздің мекенжай", ru: "Наш адрес", en: "Our Address" },
+            'contact-address': { kz: "Қызылорда қ., Ы.Жахаев көш. 18", ru: "г. Кызылорда, ул. Ы.Жахаева 18", en: "Kyzylorda, Y. Zhakhayev st. 18" },
+            'contact-phone-title': { kz: "Қабылдау комиссиясы", ru: "Приемная комиссия", en: "Admissions Committee" },
+            
+            // Форма
+            'form-name': { kz: "Атыңыз", ru: "Ваше Имя", en: "Your Name" },
+            'form-email': { kz: "Электронды поштаңыз", ru: "Ваш Email", en: "Your Email" },
+            'form-msg': { kz: "Хабарламаңыз", ru: "Ваше Сообщение", en: "Your Message" },
+            'form-submit': { kz: "Өтініш жіберу", ru: "Отправить заявку", en: "Send Application" },
+
+            // Секции Студентам и Новости
+            'student-title': { kz: "Студентке арналған ақпарат", ru: "Информация для студентов", en: "Information for Students" },
+            'student-desc': { kz: "Сабақ кестесі, оқу материалдары және студенттік өмір.", ru: "Расписание занятий, учебные материалы и студенческая жизнь.", en: "Class schedules, study materials, and student life." },
+            'news-title': { kz: "Соңғы жаңалықтар", ru: "Последние новости", en: "Latest News" },
+            'news-desc': { kz: "Колледж өміріндегі маңызды оқиғалар мен хабарландырулар.", ru: "Важные события и объявления из жизни колледжа.", en: "Important events and announcements from college life." }
         };
 
         // Главная функция смены языка
         function setLanguage(lang) {
-            // Ищем все элементы с атрибутом data-i18n и меняем их текст
-            const elements = document.querySelectorAll('[data-i18n]');
-            elements.forEach(el => {
+            // Перевод обычного текста
+            document.querySelectorAll('[data-i18n]').forEach(el => {
                 const key = el.getAttribute('data-i18n');
                 if (translations[key] && translations[key][lang]) {
                     el.textContent = translations[key][lang];
                 }
             });
 
-            // Обновляем системный атрибут lang у тега <html> для SEO и доступности
-            document.documentElement.lang = lang;
+            // Перевод placeholder'ов в форме
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                if (translations[key] && translations[key][lang]) {
+                    el.setAttribute('placeholder', translations[key][lang]);
+                }
+            });
 
-            // Сохраняем выбранный язык в локальное хранилище браузера
+            // Обновляем системный язык страницы
+            document.documentElement.lang = lang;
             localStorage.setItem('lang', lang);
 
-            // Визуально обновляем активную кнопку языка в шапке
+            // Визуально переключаем активную кнопку
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.getAttribute('data-lang') === lang) {
@@ -232,23 +625,82 @@
             });
         }
 
-        // Инициализация при загрузке документа
+        // ==========================================
+        // Инициализация скриптов при загрузке
+        // ==========================================
         document.addEventListener('DOMContentLoaded', () => {
-            // Извлекаем сохраненный язык из localStorage. Если его нет — ставим 'kz' строго по умолчанию.
+            // 1. Установка языка по умолчанию (KZ, если нет сохраненного)
             const savedLang = localStorage.getItem('lang') || 'kz';
-            
-            // Применяем язык ко всему интерфейсу
             setLanguage(savedLang);
 
-            // Навешиваем слушатели событий клика на каждую кнопку переключателя
-            const langButtons = document.querySelectorAll('.lang-btn');
-            langButtons.forEach(btn => {
+            // Обработчики кликов для переключателей языка
+            document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const selectedLang = e.target.getAttribute('data-lang');
                     setLanguage(selectedLang);
                 });
             });
+
+            // 2. Мобильное меню (гамбургер)
+            const mobileBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links');
+
+            mobileBtn.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                const icon = mobileBtn.querySelector('i');
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.replace('fa-bars', 'fa-times');
+                } else {
+                    icon.classList.replace('fa-times', 'fa-bars');
+                }
+            });
+
+            // Закрытие мобильного меню при клике на ссылку
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('active');
+                    mobileBtn.querySelector('i').classList.replace('fa-times', 'fa-bars');
+                });
+            });
+
+            // 3. Анимация появления элементов при скролле (Scroll Reveal)
+            const revealElements = document.querySelectorAll('.reveal');
+            const revealOnScroll = () => {
+                const windowHeight = window.innerHeight;
+                const elementVisible = 100;
+
+                revealElements.forEach((el) => {
+                    const elementTop = el.getBoundingClientRect().top;
+                    if (elementTop < windowHeight - elementVisible) {
+                        el.classList.add('active');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', revealOnScroll);
+            revealOnScroll(); // Запуск при загрузке
+
+            // 4. Обработка отправки формы (имитация)
+            document.getElementById('contactForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const btn = this.querySelector('button');
+                const originalText = btn.textContent;
+                const currentLang = localStorage.getItem('lang') || 'kz';
+                
+                // Простая смена текста для эффекта отправки
+                const successMsg = { kz: "Жіберілді!", ru: "Отправлено!", en: "Sent!" };
+                
+                btn.textContent = successMsg[currentLang];
+                btn.style.backgroundColor = '#38a169'; // Зеленый цвет успеха
+                
+                setTimeout(() => {
+                    this.reset();
+                    btn.textContent = originalText;
+                    btn.style.backgroundColor = '';
+                }, 3000);
+            });
         });
     </script>
 </body>
 </html>
+```
