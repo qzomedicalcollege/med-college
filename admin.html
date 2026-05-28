@@ -1,0 +1,181 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора ВМК</title>
+    <!-- Подключаем современный шрифт -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Базовые стили для админки */
+        :root {
+            --primary-color: #0056b3;
+            --danger-color: #dc3545;
+            --bg-light: #f4f7f6;
+            --text-dark: #333;
+            --border-radius: 8px;
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            padding: 20px; 
+            background: var(--bg-light); 
+            color: var(--text-dark);
+        }
+
+        .hidden { display: none !important; }
+        
+        .container { 
+            max-width: 800px; 
+            margin: 40px auto; 
+            background: #fff; 
+            padding: 30px; 
+            border-radius: var(--border-radius); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+        }
+
+        h2, h3 { color: var(--primary-color); margin-bottom: 20px; }
+
+        .form-group { margin-bottom: 15px; }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input, textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        button { 
+            padding: 12px 20px; 
+            background: var(--primary-color); 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            border-radius: 6px; 
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        button:hover { background: #004494; }
+        
+        button.danger { background: var(--danger-color); }
+        button.danger:hover { background: #c82333; }
+
+        .news-item { 
+            border: 1px solid #eee; 
+            padding: 15px; 
+            margin-top: 15px; 
+            border-radius: var(--border-radius); 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .news-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        hr { border: none; border-top: 1px solid #eee; margin: 30px 0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Блок авторизации -->
+    <div id="login-section">
+        <h2>Вход в панель управления</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Email администратора</label>
+                <input type="email" id="email" placeholder="admin@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit">Войти</button>
+            <p id="login-error" style="color: var(--danger-color); margin-top: 10px;"></p>
+        </form>
+    </div>
+
+    <!-- Панель управления (скрыта по умолчанию) -->
+    <div id="dashboard-section" class="hidden">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Dashboard (Управление контентом)</h2>
+            <button id="logout-btn" class="danger">Выйти</button>
+        </div>
+
+        <hr>
+
+        <!-- Управление текстами на сайте -->
+        <h3>Редактирование текстов (Главный экран)</h3>
+        <form id="content-form">
+            <div class="form-group">
+                <label for="hero_title">Главный заголовок:</label>
+                <input type="text" id="hero_title" required>
+            </div>
+            <div class="form-group">
+                <label for="hero_subtitle">Подзаголовок:</label>
+                <textarea id="hero_subtitle" rows="3" required></textarea>
+            </div>
+            <button type="submit">Сохранить контент</button>
+        </form>
+
+        <hr>
+
+        <!-- Добавление/Редактирование новостей -->
+        <h3>Добавить / Редактировать новость</h3>
+        <form id="news-form">
+            <input type="hidden" id="edit_news_id">
+            <div class="form-group">
+                <label for="news_title">Заголовок новости</label>
+                <input type="text" id="news_title" placeholder="Введите заголовок" required>
+            </div>
+            <div class="form-group">
+                <label for="news_image">Ссылка на изображение (ImgBB)</label>
+                <input type="url" id="news_image" placeholder="https://i.ibb.co/..." required>
+            </div>
+            <div class="form-group">
+                <label for="news_text">Текст новости</label>
+                <textarea id="news_text" placeholder="Подробное описание..." rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="news_date">Дата публикации</label>
+                <input type="date" id="news_date" required>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button type="submit" id="news-submit-btn">Опубликовать</button>
+                <button type="button" id="news-cancel-btn" class="hidden danger">Отменить редактирование</button>
+            </div>
+        </form>
+
+        <hr>
+
+        <!-- Список существующих новостей -->
+        <h3>Список опубликованных новостей</h3>
+        <div id="news-list">Загрузка данных из базы...</div>
+    </div>
+</div>
+
+<!-- Подключение логики админки как ES-модуля -->
+<script type="module" src="admin.js"></script>
+</body>
+</html>
