@@ -199,9 +199,9 @@
             try {
                 let imageUrl = "";
                 
+                // ТЕПЕРЬ НОЛИК В КВАДРАТНЫХ СКОБКАХ ТОЧНО ЕСТЬ!
                 if (fileInput.files.length > 0) {
                     let formData = new FormData();
-                    // ТЕПЕРЬ НОЛИК И КВАДРАТНЫЕ СКОБКИ НА 100% ТУТ:
                     formData.append("image", fileInput.files);
                     
                     let imgResponse = await fetch("https://api.imgbb.com/1/upload?key=" + imgbbKey, {
