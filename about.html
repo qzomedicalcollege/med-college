@@ -28,7 +28,6 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
         .hidden { display: none !important; }
 
-        /* HEADER */
         header { position: fixed; top: 0; left: 0; width: 100%; background-color: rgba(255,255,255,0.95); backdrop-filter: blur(10px); box-shadow: 0 2px 15px rgba(0,0,0,0.05); z-index: 1000; }
         .navbar { display: flex; justify-content: space-between; align-items: center; height: 80px; }
         .logo { font-size: 24px; font-weight: 800; color: var(--primary-color); display: flex; align-items: center; gap: 10px; }
@@ -42,12 +41,10 @@
         .lang-btn.active { background: var(--primary-color); color: #fff; box-shadow: 0 2px 5px rgba(0,86,179,0.2); }
         .mobile-menu-btn { display: none; font-size: 24px; color: var(--primary-color); cursor: pointer; }
 
-        /* PAGE HERO */
         .page-hero { padding: 130px 20px 60px; background: linear-gradient(135deg, #e3f2fd 0%, var(--bg-white) 100%); text-align: center; }
         .page-hero h1 { font-size: 40px; font-weight: 800; color: var(--primary-color); margin-bottom: 12px; }
         .page-hero p { color: var(--text-light); font-size: 17px; max-width: 600px; margin: 0 auto; }
 
-        /* CONTENT */
         .content-area { max-width: 900px; margin: 50px auto 80px; padding: 0 20px; }
         .content-item { background: var(--bg-white); border-radius: var(--border-radius); padding: 30px; margin-bottom: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px rgba(0,0,0,0.04); transition: var(--transition); }
         .content-item:hover { box-shadow: var(--shadow); transform: translateY(-2px); }
@@ -62,7 +59,6 @@
         .btn-delete { background: #fff5f5; color: var(--danger-color); border: 1px solid #feb2b2; }
         .btn-delete:hover { background: var(--danger-color); color: #fff; }
 
-        /* ADMIN FORM */
         .admin-form { background: var(--bg-white); border-radius: var(--border-radius); padding: 30px; margin-bottom: 30px; border: 2px solid var(--primary-color); box-shadow: var(--shadow); }
         .admin-form h3 { color: var(--primary-color); margin-bottom: 20px; font-size: 18px; display: flex; align-items: center; gap: 8px; }
         .form-group { margin-bottom: 15px; }
@@ -74,11 +70,9 @@
         .btn-logout { width: 100%; padding: 11px; background: transparent; color: var(--text-light); border: 1px solid #e2e8f0; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: var(--transition); }
         .btn-logout:hover { background: var(--bg-light); color: var(--text-dark); }
 
-        /* LOADING */
         .loading { text-align: center; padding: 60px; color: var(--text-light); }
         .loading i { font-size: 36px; color: var(--primary-color); margin-bottom: 15px; display: block; }
 
-        /* FOOTER */
         footer { background: #1a202c; color: #fff; padding: 40px 20px; text-align: center; }
         .socials { margin-bottom: 20px; display: flex; justify-content: center; gap: 15px; }
         .socials a { width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: var(--transition); }
@@ -102,7 +96,6 @@
             <nav>
                 <ul class="nav-links">
                     <li><a href="about.html" class="active" data-i18n="nav-about">Колледж туралы</a></li>
-                    <li><a href="entrants.html" data-i18n="nav-entrants">Талапкерге</a></li>
                     <li><a href="students.html" data-i18n="nav-students">Студентке</a></li>
                     <li><a href="index.html#news-section" data-i18n="nav-news">Жаңалықтар</a></li>
                     <li><a href="index.html#contacts" data-i18n="nav-contacts">Байланыс</a></li>
@@ -174,7 +167,6 @@
 
         const i18n = {
             'nav-about':    { kz: "Колледж туралы",   ru: "О колледже",       en: "About" },
-            'nav-entrants': { kz: "Талапкерге",        ru: "Абитуриентам",     en: "Applicants" },
             'nav-students': { kz: "Студентке",         ru: "Студентам",        en: "Students" },
             'nav-news':     { kz: "Жаңалықтар",        ru: "Новости",          en: "News" },
             'nav-contacts': { kz: "Байланыс",          ru: "Контакты",         en: "Contacts" },
@@ -338,22 +330,18 @@
             }
         });
 
-
-// Парсинг ссылок в тексте: [текст](url) и голые https://...
-function parseLinks(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    let safe = div.innerHTML;
-    safe = safe.replace(/\n/g, '<br>');
-    // [текст](https://...) → кликабельная ссылка
-    safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
-        '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#0056b3;font-weight:600;text-decoration:underline;">$1</a>');
-    // голый https://... → кликабельная ссылка
-    safe = safe.replace(/(?<![="'\(])(https?:\/\/[^\s<,)]+)/g,
-        '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0056b3;text-decoration:underline;">$1</a>');
-    return safe;
-}
+        function parseLinks(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            let safe = div.innerHTML;
+            safe = safe.replace(/\n/g, '<br>');
+            safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#0056b3;font-weight:600;text-decoration:underline;">$1</a>');
+            safe = safe.replace(/(?<![="'\(])(https?:\/\/[^\s<,)]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0056b3;text-decoration:underline;">$1</a>');
+            return safe;
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             setLanguage(localStorage.getItem('site_lang') || 'kz');
@@ -370,4 +358,3 @@ function parseLinks(text) {
     </script>
 </body>
 </html>
-
