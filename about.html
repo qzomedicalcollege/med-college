@@ -97,7 +97,7 @@
 
     <header>
         <div class="container navbar">
-            <a href="index.html" class="logo"><img src="logo.png" alt="Логотип" style="height:52px;width:auto;"></a>
+            <a href="index.html" class="logo"><img src="Logo.png" alt="Логотип" style="height:52px;width:auto;"></a>
             <nav>
                 <ul class="nav-links">
                     <li><a href="about.html" class="active" data-i18n="nav-about">Колледж туралы</a></li>
@@ -138,8 +138,9 @@
                     <textarea id="input-text" rows="5" placeholder="Текст блока..."></textarea>
                 </div>
                 <div class="form-group">
-                    <label data-i18n="label-image">Сурет URL (міндетті емес)</label>
-                    <input type="url" id="input-image" placeholder="https://...">
+                    <label data-i18n="label-image">Сурет (міндетті емес)</label>
+                    <input type="file" id="input-image" accept="image/*" style="padding:8px;">
+                    <div id="upload-status" style="font-size:13px;color:#718096;margin-top:6px;display:none;"></div>
                 </div>
                 <button class="btn-submit" id="add-btn" data-i18n="btn-add">Қосу</button>
                 <button class="btn-logout" id="logout-btn" data-i18n="btn-logout">Панельден шығу</button>
@@ -181,7 +182,7 @@
             'admin-add':    { kz: "Жаңа блок қосу",   ru: "Добавить блок",    en: "Add block" },
             'label-title':  { kz: "Тақырып",           ru: "Заголовок",        en: "Title" },
             'label-text':   { kz: "Мәтін",             ru: "Текст",            en: "Text" },
-            'label-image':  { kz: "Сурет URL (міндетті емес)", ru: "URL изображения (необязательно)", en: "Image URL (optional)" },
+            'label-image':  { kz: "Сурет (міндетті емес)", ru: "Изображение (необязательно)", en: "Image (optional)" },
             'btn-add':      { kz: "Қосу",              ru: "Добавить",         en: "Add" },
             'btn-logout':   { kz: "Панельден шығу",    ru: "Выйти из панели",  en: "Logout" },
             'loading':      { kz: "Жүктелуде...",      ru: "Загрузка...",      en: "Loading..." },
@@ -284,17 +285,56 @@
         document.getElementById('add-btn').addEventListener('click', async () => {
             const title = document.getElementById('input-title').value.trim();
             const text = document.getElementById('input-text').value.trim();
-            const image = document.getElementById('input-image').value.trim();
+            const fileInput = document.getElementById('input-image');
+            const statusEl = document.getElementById('upload-status');
+
             if (!title || !text) return alert(getLang() === 'kz' ? 'Тақырып пен мәтінді толтырыңыз!' : 'Заполните заголовок и текст!');
-            await fetch(`${BASE_URL}.json`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, text, image, timestamp: Date.now() })
-            });
-            document.getElementById('input-title').value = '';
-            document.getElementById('input-text').value = '';
-            document.getElementById('input-image').value = '';
-            loadContent();
+
+            const addBtn = document.getElementById('add-btn');
+            addBtn.disabled = true;
+            let imageUrl = '';
+
+            try {
+                if (fileInput.files && fileInput.files[0]) {
+                    statusEl.style.display = 'block';
+                    statusEl.textContent = getLang() === 'kz' ? 'Сурет жүктелуде...' : 'Загрузка изображения...';
+                    addBtn.textContent = '...';
+
+                    const formData = new FormData();
+                    formData.append('image', fileInput.files[0]);
+
+                    const imgRes = await fetch('https://api.imgbb.com/1/upload?key=e743803bf9be739f3ae6fc6cabda585f', {
+                        method: 'POST', body: formData
+                    });
+                    const imgData = await imgRes.json();
+
+                    if (imgData.success) {
+                        imageUrl = imgData.data.url;
+                        statusEl.textContent = getLang() === 'kz' ? '✅ Сурет жүктелді' : '✅ Изображение загружено';
+                    } else {
+                        throw new Error('ImgBB error');
+                    }
+                }
+
+                await fetch(`${BASE_URL}.json`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, text, image: imageUrl, timestamp: Date.now() })
+                });
+
+                document.getElementById('input-title').value = '';
+                document.getElementById('input-text').value = '';
+                fileInput.value = '';
+                statusEl.style.display = 'none';
+                loadContent();
+
+            } catch(e) {
+                alert(getLang() === 'kz' ? 'Қате: ' + e.message : 'Ошибка: ' + e.message);
+            } finally {
+                addBtn.disabled = false;
+                addBtn.textContent = document.querySelector('[data-i18n="btn-add"]')?.getAttribute('data-i18n') === 'btn-add'
+                    ? (i18n['btn-add'][getLang()] || 'Қосу') : 'Қосу';
+            }
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -312,3 +352,4 @@
     </script>
 </body>
 </html>
+
