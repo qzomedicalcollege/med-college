@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logo.png">
     <title>Қызылорда жоғары медициналық колледжі</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
@@ -252,11 +253,13 @@
 
                 <div class="contact-form-block">
                     <h3 style="margin-bottom: 20px; font-size: 22px; color: var(--text-dark);" data-i18n="form-title">Обратная связь</h3>
-                    <form onsubmit="event.preventDefault(); alert('Отправлено!'); this.reset();">
-                        <div class="form-group"><input type="text" placeholder="Ваше имя" required></div>
-                        <div class="form-group"><input type="email" placeholder="Email" required></div>
-                        <div class="form-group"><textarea rows="4" placeholder="Сообщение" required></textarea></div>
-                        <button type="submit" class="btn-submit" data-i18n="form-btn">Отправить</button>
+                    <form id="contact-form" onsubmit="submitContactForm(event)">
+                        <div class="form-group"><input type="text" name="name" placeholder="Ваше имя" required></div>
+                        <div class="form-group"><input type="email" name="email" placeholder="Email" required></div>
+                        <div class="form-group"><textarea rows="4" name="message" placeholder="Сообщение" required></textarea></div>
+                        <button type="submit" class="btn-submit" id="form-submit-btn" data-i18n="form-btn">Отправить</button>
+                        <div id="form-success" style="display:none;margin-top:14px;padding:12px;background:#f0fff4;border-radius:8px;color:#276749;font-weight:600;text-align:center;">✅ Хабарлама жіберілді! / Сообщение отправлено!</div>
+                        <div id="form-error" style="display:none;margin-top:14px;padding:12px;background:#fff5f5;border-radius:8px;color:#c53030;font-weight:600;text-align:center;">❌ Қате. Қайталап көріңіз.</div>
                     </form>
                 </div>
             </div>
@@ -316,6 +319,39 @@
             });
         }
 
+
+        // FORMSPREE — Форма обратной связи
+        async function submitContactForm(e) {
+            e.preventDefault();
+            const form = e.target;
+            const btn = document.getElementById('form-submit-btn');
+            const success = document.getElementById('form-success');
+            const error = document.getElementById('form-error');
+            btn.disabled = true;
+            btn.textContent = '...';
+            success.style.display = 'none';
+            error.style.display = 'none';
+            try {
+                const res = await fetch('https://formspree.io/f/mdajbqev', {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (res.ok) {
+                    form.reset();
+                    success.style.display = 'block';
+                    setTimeout(() => success.style.display = 'none', 6000);
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch(err) {
+                error.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = i18n['form-btn'] ? i18n['form-btn'][localStorage.getItem('site_lang') || 'kz'] : 'Отправить';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             // Инициализация языка
             setLanguage(localStorage.getItem('site_lang') || 'kz');
@@ -339,7 +375,7 @@
             if(localStorage.getItem('isMedAdmin') !== 'true') {
                 const login = prompt('Логин:');
                 const pass = prompt('Пароль:');
-                if(login === 'admin' && pass === 'admin') {
+                if(login === 'QMHC' && pass === 'CHMQ') {
                     localStorage.setItem('isMedAdmin', 'true');
                     alert('Доступ разрешен!');
                     checkAdminState();
@@ -397,7 +433,7 @@
                             <div class="news-content">
                                 <div class="news-date">${dateStr}</div>
                                 <h3 class="news-title">${item.title}</h3>
-                                <p class="news-text">${item.content}</p>
+                                <p class="news-text">${parseLinks(item.content)}</p>
                                 ${deleteBtnHtml}
                             </div>
                         </div>
