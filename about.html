@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="Logo.png">
     <title>Колледж туралы - Қызылорда жоғары медициналық колледжі</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -236,7 +237,7 @@
                         </div>` : '';
                     const div = document.createElement('div');
                     div.className = 'content-item';
-                    div.innerHTML = `<h3>${item.title}</h3><p>${item.text}</p>${imgHtml}${adminBtns}`;
+                    div.innerHTML = `<h3>${item.title}</h3><p>${parseLinks(item.text)}</p>${imgHtml}${adminBtns}`;
                     container.appendChild(div);
                 });
             } catch(e) {
@@ -268,7 +269,7 @@
             if (localStorage.getItem('isMedAdmin') !== 'true') {
                 const login = prompt('Логин:');
                 const pass = prompt('Пароль:');
-                if (login === 'admin' && pass === 'admin') {
+                if (login === 'QMHC' && pass === 'CHMQ') {
                     localStorage.setItem('isMedAdmin', 'true');
                     checkAdminState();
                     loadContent();
@@ -336,6 +337,23 @@
                     ? (i18n['btn-add'][getLang()] || 'Қосу') : 'Қосу';
             }
         });
+
+
+// Парсинг ссылок в тексте: [текст](url) и голые https://...
+function parseLinks(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    let safe = div.innerHTML;
+    safe = safe.replace(/\n/g, '<br>');
+    // [текст](https://...) → кликабельная ссылка
+    safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#0056b3;font-weight:600;text-decoration:underline;">$1</a>');
+    // голый https://... → кликабельная ссылка
+    safe = safe.replace(/(?<![="'\(])(https?:\/\/[^\s<,)]+)/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0056b3;text-decoration:underline;">$1</a>');
+    return safe;
+}
 
         document.addEventListener('DOMContentLoaded', () => {
             setLanguage(localStorage.getItem('site_lang') || 'kz');
