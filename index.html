@@ -10,9 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* ==========================================
-           БАЗОВЫЕ НАСТРОЙКИ И ПЕРЕМЕННЫЕ
-           ========================================== */
+        /* БАЗОВЫЕ НАСТРОЙКИ И ПЕРЕМЕННЫЕ */
         :root {
             --primary-color: #0056b3;
             --primary-hover: #004494;
@@ -147,9 +145,8 @@
             <nav>
                 <ul class="nav-links">
                     <li><a href="about.html" data-i18n="nav-about">Колледж туралы</a></li>
-                    <li><a href="#specialties" data-i18n="nav-specialties">Мамандықтар</a></li>
+                    <li><a href="#specialties" data-i18n="nav-specialties">Мамандық</a></li>
                     <li><a href="#news-section" data-i18n="nav-news">Жаңалықтар</a></li>
-                    <li><a href="entrants.html" data-i18n="nav-applicant">Талапкерге</a></li>
                     <li><a href="students.html" data-i18n="nav-students">Студентке</a></li>
                     <li>
                         <div class="lang-switcher">
@@ -168,28 +165,18 @@
         <div class="container">
             <h1 class="hero-title" data-i18n="hero-title">Қызылорда жоғары медициналық колледжі</h1>
             <p class="hero-subtitle" data-i18n="hero-subtitle">Сапалы медициналық білім, заманауи технологиялар және тәжірибелі оқытушылар.</p>
-            <a href="#contacts" class="btn-primary" data-i18n="hero-btn">Оқуға түсу</a>
+            <a href="#contacts" class="btn-primary" data-i18n="hero-btn">Байланысқа шығу</a>
         </div>
     </section>
 
     <section id="specialties">
         <div class="container">
-            <h2 class="section-title" data-i18n="nav-specialties">Мамандықтар / Специальности</h2>
-            <div class="grid-cards">
-                <div class="card">
+            <h2 class="section-title" data-i18n="nav-specialties">Мамандық / Специальность</h2>
+            <div class="grid-cards" style="display: flex; justify-content: center;">
+                <div class="card" style="max-width: 450px; width: 100%;">
                     <i class="fa-solid fa-user-nurse card-icon"></i>
-                    <h3 data-i18n="spec-1">Мейіргер ісі</h3>
-                    <p data-i18n="spec-1-desc">Халықаралық стандарттар бойынша мейіргерлерді даярлау.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-briefcase-medical card-icon"></i>
-                    <h3 data-i18n="spec-2">Емдеу ісі</h3>
-                    <p data-i18n="spec-2-desc">Жедел жәрдем және емханалар үшін білікті фельдшерлерді даярлау.</p>
-                </div>
-                <div class="card">
-                    <i class="fa-solid fa-pills card-icon"></i>
-                    <h3 data-i18n="spec-3">Фармация</h3>
-                    <p data-i18n="spec-3-desc">Заманауи дәрі-дәрмектерді жасау және сақтау ережелері.</p>
+                    <h3 data-i18n="spec-1">Мейіргер ісінің қолданбалы бакалавры</h3>
+                    <p data-i18n="spec-1-desc">Халықаралық стандарттар бойынша жоғары білікті мейіргерлерді даярлау.</p>
                 </div>
             </div>
         </div>
@@ -279,26 +266,19 @@
     </footer>
 
     <script>
-        // КЛЮЧИ
         const IMGBB_API_KEY = "e743803bf9be739f3ae6fc6cabda585f"; 
-        const FIREBASE_DB_URL = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news"; // Для добавления .json при запросах
+        const FIREBASE_DB_URL = "https://qzomedicalcollege-default-rtdb.firebaseio.com/news"; 
 
-        // МУЛЬТИЯЗЫЧНОСТЬ
         const i18n = {
             'nav-about': { kz: "Колледж туралы", ru: "О колледже", en: "About College" },
-            'nav-applicant': { kz: "Талапкерге", ru: "Абитуриентам", en: "For Applicants" },
             'nav-students': { kz: "Студентке", ru: "Студентам", en: "For Students" },
-            'nav-specialties': { kz: "Мамандықтар", ru: "Специальности", en: "Specialties" },
+            'nav-specialties': { kz: "Мамандық", ru: "Специальность", en: "Specialty" },
             'nav-news': { kz: "Жаңалықтар", ru: "Новости", en: "News" },
             'hero-title': { kz: "Қызылорда жоғары медициналық колледжі", ru: "Кызылординский высший медицинский колледж", en: "Kyzylorda Higher Medical College" },
             'hero-subtitle': { kz: "Сапалы медициналық білім, заманауи технологиялар және тәжірибелі оқытушылар.", ru: "Качественное медицинское образование на базе современных технологий.", en: "Quality medical education based on modern technologies." },
-            'hero-btn': { kz: "Оқуға түсу", ru: "Поступить", en: "Apply Now" },
-            'spec-1': { kz: "Мейіргер ісі", ru: "Сестринское дело", en: "Nursing" },
-            'spec-1-desc': { kz: "Халықаралық стандарттар бойынша мейіргерлерді даярлау.", ru: "Подготовка медицинских сестер по международным стандартам.", en: "Training of nurses according to international standards." },
-            'spec-2': { kz: "Емдеу ісі", ru: "Лечебное дело", en: "General Medicine" },
-            'spec-2-desc': { kz: "Жедел жәрдем және емханалар үшін білікті фельдшерлерді даярлау.", ru: "Подготовка квалифицированных фельдшеров для поликлиник.", en: "Training of qualified paramedics for clinics." },
-            'spec-3': { kz: "Фармация", ru: "Фармация", en: "Pharmacy" },
-            'spec-3-desc': { kz: "Заманауи дәрі-дәрмектерді жасау және сақтау ережелері.", ru: "Изучение изготовления и хранения лекарственных средств.", en: "Manufacturing and storage of modern medicines." },
+            'hero-btn': { kz: "Байланысқа шығу", ru: "Связаться с нами", en: "Contact Us" },
+            'spec-1': { kz: "Мейіргер ісінің қолданбалы бакалавры", ru: "Прикладной бакалавр сестринского дела", en: "Applied Bachelor of Nursing" },
+            'spec-1-desc': { kz: "Халықаралық стандарттар бойынша жоғары білікті мейіргерлерді даярлау.", ru: "Подготовка высококвалифицированных медицинских сестер по международным стандартам.", en: "Training of highly qualified nurses according to international standards." },
             'contacts-title': { kz: "Байланыстар", ru: "Контакты", en: "Contacts" },
             'contact-addr-title': { kz: "Мекенжай", ru: "Адрес", en: "Address" },
             'contact-addr': { kz: "Қызылорда қ., Ы.Жахаев көш. 18", ru: "г. Кызылорда, ул. Ы.Жахаева 18", en: "Kyzylorda, Y. Zhakhayev st. 18" },
@@ -319,8 +299,6 @@
             });
         }
 
-
-        // FORMSPREE — Форма обратной связи
         async function submitContactForm(e) {
             e.preventDefault();
             const form = e.target;
@@ -353,24 +331,20 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Инициализация языка
             setLanguage(localStorage.getItem('site_lang') || 'kz');
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.addEventListener('click', e => setLanguage(e.target.getAttribute('data-lang')));
             });
 
-            // Мобильное меню
             const mobileBtn = document.querySelector('.mobile-menu-btn');
             const navLinks = document.querySelector('.nav-links');
             mobileBtn.addEventListener('click', () => navLinks.classList.toggle('active'));
             navLinks.querySelectorAll('a').forEach(link => link.addEventListener('click', () => navLinks.classList.remove('active')));
 
-            // Проверка админа и загрузка новостей
             checkAdminState();
             loadNews();
         });
 
-        // ЛОГИН / ЛОГАУТ АДМИНА
         document.getElementById('admin-login-trigger').addEventListener('click', () => {
             if(localStorage.getItem('isMedAdmin') !== 'true') {
                 const login = prompt('Логин:');
@@ -397,11 +371,9 @@
             document.getElementById('admin-panel').classList.toggle('hidden', !isAdmin);
         }
 
-        // ЗАГРУЗКА И ОТОБРАЖЕНИЕ НОВОСТЕЙ
         async function loadNews() {
             const container = document.getElementById('news-container');
             try {
-                // Избегаем жесткого кэширования телефона
                 const response = await fetch(`${FIREBASE_DB_URL}.json?_=${new Date().getTime()}`, { cache: 'no-store' });
                 const data = await response.json();
                 
@@ -411,7 +383,6 @@
                     return;
                 }
 
-                // Преобразуем Firebase объект в массив и сортируем новые сверху
                 const newsArray = Object.keys(data).map(key => ({ id: key, ...data[key] }));
                 newsArray.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -422,7 +393,6 @@
                     const defaultImg = 'https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?w=500&q=80';
                     const finalImg = item.imageUrl ? item.imageUrl : defaultImg;
                     
-                    // Кнопка удаления появится только если мы залогинены как админ
                     const deleteBtnHtml = isAdmin 
                         ? `<button data-id="${item.id}" class="delete-btn"><i class="fa-solid fa-trash"></i> Удалить новость</button>` 
                         : '';
@@ -444,13 +414,11 @@
             }
         }
 
-        // ПУБЛИКАЦИЯ НОВОСТИ (Исправлена отправка картинки!)
         document.getElementById('publish-btn').addEventListener('click', async () => {
             const title = document.getElementById('news-title').value;
             const content = document.getElementById('news-content').value;
             const fileInput = document.getElementById('news-image');
             
-            // ВАЖНОЕ ИСПРАВЛЕНИЕ: Берем строго [0] файл, чтобы ImgBB не выдавал ошибку
             const file = fileInput.files[0]; 
             const publishBtn = document.getElementById('publish-btn');
 
@@ -462,10 +430,9 @@
             try {
                 let imageUrl = "";
 
-                // Грузим фото на ImgBB
                 if (file) {
                     const formData = new FormData();
-                    formData.append('image', file); // Теперь здесь только 1 файл!
+                    formData.append('image', file); 
 
                     const imgRes = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
                         method: 'POST',
@@ -480,7 +447,6 @@
                     }
                 }
 
-                // Отправляем в Firebase
                 const newDoc = {
                     title: title,
                     content: content,
@@ -501,7 +467,7 @@
                 document.getElementById('news-content').value = '';
                 fileInput.value = '';
                 
-                loadNews(); // Перезагружаем ленту, чтобы увидеть новость
+                loadNews(); 
 
             } catch (error) {
                 alert("Ошибка публикации: " + error.message);
@@ -511,7 +477,6 @@
             }
         });
 
-        // УДАЛЕНИЕ НОВОСТИ
         document.getElementById('news-container').addEventListener('click', async (e) => {
             const deleteBtn = e.target.closest('.delete-btn');
             if (deleteBtn) {
@@ -522,13 +487,9 @@
                     deleteBtn.disabled = true;
                     
                     try {
-                        // Правильная ссылка для удаления конкретной новости в Firebase
                         const deleteUrl = `${FIREBASE_DB_URL}/${id}.json`;
-                        
                         const res = await fetch(deleteUrl, { method: 'DELETE' });
                         if (!res.ok) throw new Error("Ошибка при удалении в базе");
-                        
-                        // Если удалилось успешно, просто обновляем список на экране
                         loadNews(); 
                     } catch (err) {
                         alert('Ошибка удаления: ' + err.message);
@@ -538,7 +499,19 @@
                 }
             }
         });
+
+        function parseLinks(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            let safe = div.innerHTML;
+            safe = safe.replace(/\n/g, '<br>');
+            safe = safe.replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
+                '<a href="$2" target="_blank" rel="noopener noreferrer" style="color:#0056b3;font-weight:600;text-decoration:underline;">$1</a>');
+            safe = safe.replace(/(?<![="'\(])(https?:\/\/[^\s<,)]+)/g,
+                '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0056b3;text-decoration:underline;">$1</a>');
+            return safe;
+        }
     </script>
 </body>
 </html>
-
