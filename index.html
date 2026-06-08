@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="kz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Қызылорда жоғары медициналық колледжі</title>
+  <meta name="description" content="Қызылорда жоғары медициналық колледжі — жаңалықтар, студенттерге ақпарат және байланыстар.">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <div class="container navbar">
+      <a href="index.html" class="logo"><img src="assets/logo.png" alt="Логотип"><span data-i18n="hero-title">Қызылорда жоғары медициналық колледжі</span></a>
+      <nav>
+        <ul class="nav-links">
+          <li><a href="about.html" data-i18n="nav-about">Колледж туралы</a></li>
+          <li><a href="#specialties" data-i18n="nav-specialties">Мамандық</a></li>
+          <li><a href="#news-section" data-i18n="nav-news">Жаңалықтар</a></li>
+          <li><a href="students.html" data-i18n="nav-students">Студентке</a></li>
+          <li><a href="#contacts" data-i18n="nav-contacts">Байланыс</a></li>
+          <li><div class="lang-switcher"><button class="lang-btn" data-lang="kz">KZ</button><button class="lang-btn" data-lang="ru">RU</button><button class="lang-btn" data-lang="en">EN</button></div></li>
+        </ul>
+      </nav>
+      <div class="mobile-menu-btn"><i class="fa-solid fa-bars"></i></div>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="container">
+      <h1 class="hero-title" data-i18n="hero-title">Қызылорда жоғары медициналық колледжі</h1>
+      <p class="hero-subtitle" data-i18n="hero-subtitle">Сапалы медициналық білім, заманауи технологиялар және тәжірибелі оқытушылар.</p>
+      <a href="#contacts" class="btn-primary" data-i18n="hero-btn">Байланысқа шығу</a>
+    </div>
+  </section>
+
+  <section id="specialties">
+    <div class="container">
+      <h2 class="section-title" data-i18n="specialty-title">Мамандық</h2>
+      <div class="grid-cards">
+        <article class="card">
+          <i class="fa-solid fa-user-nurse card-icon"></i>
+          <h3 data-i18n="specialty-1">Мейіргер ісінің қолданбалы бакалавры</h3>
+          <p data-i18n="specialty-1-desc">Халықаралық стандарттар бойынша жоғары білікті мейіргерлерді даярлау.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="news-section">
+    <div class="container">
+      <h2 class="section-title" data-i18n="nav-news">Жаңалықтар</h2>
+      <div id="news-container" class="news-feed"><p class="loading">Загрузка...</p></div>
+    </div>
+  </section>
+
+  <section id="contacts" class="contacts">
+    <div class="container">
+      <h2 class="section-title" data-i18n="contacts-title">Байланыстар</h2>
+      <div class="contact-wrapper">
+        <div>
+          <div class="info-item"><div class="info-icon"><i class="fa-solid fa-location-dot"></i></div><div><h4 data-i18n="contact-address-title">Мекенжай</h4><p data-i18n="contact-address">Қызылорда қ., Ы. Жахаев көшесі, 18</p></div></div>
+          <div class="info-item"><div class="info-icon"><i class="fa-solid fa-phone"></i></div><div><h4 data-i18n="contact-phone-title">Қабылдау комиссиясы</h4><p>+7 7242 23-05-13</p></div></div>
+          <div class="info-item"><div class="info-icon"><i class="fa-solid fa-envelope"></i></div><div><h4>Email</h4><p>kzmediccollege@mail.kz</p></div></div>
+        </div>
+        <div class="contact-form-block">
+          <h3 data-i18n="feedback-title">Кері байланыс</h3>
+          <form id="contact-form" onsubmit="submitContactForm(event)">
+            <div class="form-group"><input type="text" name="name" placeholder="Ваше имя" required></div>
+            <div class="form-group"><input type="email" name="email" placeholder="Email" required></div>
+            <div class="form-group"><textarea name="message" rows="4" placeholder="Сообщение" required></textarea></div>
+            <button class="btn-primary" id="form-submit-btn" type="submit" data-i18n="send">Жіберу</button>
+            <div id="form-success" class="status ok hidden">✅ Хабарлама жіберілді / Сообщение отправлено</div>
+            <div id="form-error" class="status error hidden">❌ Қате. Қайталап көріңіз.</div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="socials"><a href="#"><i class="fa-brands fa-instagram"></i></a><a href="#"><i class="fa-brands fa-telegram"></i></a><a href="#"><i class="fa-brands fa-facebook-f"></i></a></div>
+      <p data-i18n="footer-copy">© 2026 Қызылорда жоғары медициналық колледжі. Барлық құқықтар қорғалған.</p>
+      <a href="admin.html" class="admin-link">Вход для администратора</a>
+    </div>
+  </footer>
+
+  <script type="module" src="js/public.js"></script>
+</body>
+</html>

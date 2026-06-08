@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель управления | Қызылорда жоғары медициналық колледжі</title>
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <main class="admin-page">
+    <div class="admin-layout">
+      <div class="admin-header">
+        <a href="index.html" class="logo"><img src="assets/logo.png" alt="Логотип"><span>Панель управления</span></a>
+        <a href="index.html" class="btn-secondary"><i class="fa-solid fa-arrow-left"></i> На сайт</a>
+      </div>
+
+      <section id="login-section" class="admin-card">
+        <h1 style="margin-bottom:18px;color:var(--primary-color);">Вход администратора</h1>
+        <p style="color:var(--text-light);margin-bottom:20px;">Используйте email и пароль пользователя, созданного в Supabase Authentication.</p>
+        <form id="login-form">
+          <div class="form-group"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required></div>
+          <div class="form-group"><label for="password">Пароль</label><input id="password" type="password" autocomplete="current-password" required></div>
+          <button class="btn-primary" type="submit">Войти</button>
+        </form>
+        <div id="status-box" class="status"></div>
+      </section>
+
+      <section id="dashboard-section" class="hidden">
+        <div class="admin-card">
+          <div class="admin-header" style="margin-bottom:18px;">
+            <div><h1 style="color:var(--primary-color);">Админ-панель</h1><p style="color:var(--text-light);">Вы вошли как <span id="user-email"></span></p></div>
+            <button id="logout-btn" class="btn-danger" type="button"><i class="fa-solid fa-right-from-bracket"></i> Выйти</button>
+          </div>
+
+          <div class="admin-tabs">
+            <button class="tab-btn active" type="button" data-section="news">Новости</button>
+            <button class="tab-btn" type="button" data-section="about">О колледже</button>
+            <button class="tab-btn" type="button" data-section="students">Студентам</button>
+          </div>
+
+          <h2 id="form-title">Добавить: Новости</h2>
+          <p class="help">Текущий раздел: <strong id="current-section-label">Новости</strong>. Можно прикрепить PDF, Word, Excel, PowerPoint, TXT и изображения.</p>
+          <form id="item-form" style="margin-top:18px;">
+            <div class="form-group"><label for="item-title">Заголовок</label><input id="item-title" type="text" required></div>
+            <div class="form-group"><label for="item-text">Текст</label><textarea id="item-text" rows="6" required></textarea></div>
+            <div class="form-group">
+              <label for="item-files">Файлы</label>
+              <input id="item-files" type="file" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt">
+              <p class="help">Максимум 8 файлов за раз, до 20 MB каждый. Первое изображение станет превью.</p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;"><button id="submit-btn" class="btn-primary" type="submit">Опубликовать</button><button id="cancel-edit-btn" class="btn-secondary hidden" type="button">Отмена редактирования</button></div>
+          </form>
+          <div id="status-box" class="status"></div>
+        </div>
+
+        <div class="admin-card">
+          <h2 id="list-title">Опубликовано: Новости</h2>
+          <div id="item-list" class="admin-list"><p class="loading">Загрузка...</p></div>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="js/admin.js"></script>
+</body>
+</html>
