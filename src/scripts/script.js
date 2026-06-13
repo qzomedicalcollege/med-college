@@ -143,51 +143,59 @@ const defaultNews = [
 const defaultSpecialties = [
   {
     id: 1,
-    name_ru: "Лечебное дело",
-    name_kk: "Емдеу ісі",
-    name_en: "General Medicine",
-    qualification_ru: "Фельдшер",
-    qualification_kk: "Фельдшер",
-    qualification_en: "Physician Assistant (Feldsher)",
-    duration_ru: "2 года 10 месяцев (11 кл.) / 3 года 10 месяцев (9 кл.)",
-    duration_kk: "2 жыл 10 ай (11 сынып негізінде) / 3 жыл 10 ай (9 сынып негізінде)",
-    duration_en: "2 years 10 months (after 11th grade) / 3 years 10 months (after 9th grade)",
-    baseClass_ru: "9, 11 классы",
-    baseClass_kk: "9, 11 сыныптар",
-    baseClass_en: "Grades 9, 11",
-    description_ru: "Подготовка специалистов для оказания первичной медико-санитарной и неотложной помощи.",
-    description_kk: "Алғашқы медициналық-санитарлық және шұғыл көмек көрсету үшін мамандарды даярлау.",
-    description_en: "Training specialists to provide primary healthcare and emergency services.",
-    subjects_ru: "Анатомия, фармакология, терапия, хирургия, педиатрия, реаниматология",
-    subjects_kk: "Анатомия, фармакология, терапия, хирургия, педиатрия, реаниматология",
-    subjects_en: "Anatomy, pharmacology, internal medicine, surgery, pediatrics, resuscitation",
-    details_ru: "Фельдшер ведет самостоятельный прием, ставит диагнозы, назначает лечение, руководит работой медсестер. Работает на станциях скорой помощи, в здравпунктах, сельских амбулаториях (ФАП).",
-    details_kk: "Фельдшер өз бетінше қабылдау жүргізеді, диагноз қояды, ем тағайындайды, медбикелердің жұмысын басқарады. Жедел жәрдем станцияларында, денсаулық сақтау пункттерінде жұмыс істейді.",
-    details_en: "A physician assistant holds independent appointments, diagnoses, prescribes treatment, and manages nursing staff. Works at ambulance stations, health posts, and rural clinics."
+    name_ru: "Лечебное дело", name_kk: "Емдеу ісі", name_en: "General Medicine",
+    qualification_ru: "Фельдшер", qualification_kk: "Фельдшер", qualification_en: "Feldsher",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
   },
   {
     id: 2,
-    name_ru: "Сестринское дело",
-    name_kk: "Мейіргер ісі",
-    name_en: "Nursing Care",
-    qualification_ru: "Медицинская сестра общей практики",
-    qualification_kk: "Жалпы практикадағы медбике",
-    qualification_en: "General Practice Nurse",
-    duration_ru: "2 года 10 месяцев (11 кл.) / 3 года 10 месяцев (9 кл.)",
-    duration_kk: "2 жыл 10 ай (11 сынып негізінде) / 3 жыл 10 ай (9 сынып негізінде)",
-    duration_en: "2 years 10 months (after 11th grade) / 3 years 10 months (after 9th grade)",
-    baseClass_ru: "9, 11 классы",
-    baseClass_kk: "9, 11 сыныптар",
-    baseClass_en: "Grades 9, 11",
-    description_ru: "Подготовка медицинских сестер широкого профиля для работы в амбулаторных и стационарных условиях.",
-    description_kk: "Амбулаториялық және стационарлық жағдайларда жұмыс істеу үшін кең профильді медбикелерді даярлау.",
-    description_en: "Training generalist nurses for employment in inpatient and outpatient clinics.",
-    subjects_ru: "Основы сестринского дела, гигиена, терапия, педиатрия, хирургия",
-    subjects_kk: "Мейіргер ісі негіздері, гигиена, терапия, педиатрия, хирургия",
-    subjects_en: "Fundamentals of nursing, hygiene, therapy, pediatrics, surgery",
-    details_ru: "Специалист занимается уходом за больными, выполнением лечебно-профилактических назначений врача, ведением медицинской документации и пропагандой здорового образа жизни.",
-    details_kk: "Маман науқастарды күтумен, дәрігердің емдік-профилактикалық нұсқауларын орындаумен, медициналық құжаттарды жүргізумен және салауатты өмір салтын насихаттаумен айналысады.",
-    details_en: "A specialist is involved in patient care, executing therapeutic doctor prescriptions, keeping medical documentation, and promoting healthy lifestyles."
+    name_ru: "Сестринское дело", name_kk: "Мейіргер ісі", name_en: "Nursing",
+    qualification_ru: "Медицинская сестра", qualification_kk: "Мейірбике", qualification_en: "Nurse",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 3,
+    name_ru: "Акушерское дело", name_kk: "Акушер ісі", name_en: "Midwifery",
+    qualification_ru: "Акушер", qualification_kk: "Акушер", qualification_en: "Midwife",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 4,
+    name_ru: "Стоматология", name_kk: "Стоматология", name_en: "Dentistry",
+    qualification_ru: "Дантист", qualification_kk: "Дантист", qualification_en: "Dentist",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 5,
+    name_ru: "Ортопедическая стоматология", name_kk: "Ортопедиялық стоматология", name_en: "Orthopedic Dentistry",
+    qualification_ru: "Зубной техник", qualification_kk: "Тіс технигі", qualification_en: "Dental Technician",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 6,
+    name_ru: "Фармация", name_kk: "Фармация", name_en: "Pharmacy",
+    qualification_ru: "Фармацевт", qualification_kk: "Фармацевт", qualification_en: "Pharmacist",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 7,
+    name_ru: "Лабораторная диагностика", name_kk: "Зертханалық диагностика", name_en: "Laboratory Diagnostics",
+    qualification_ru: "Медицинский лаборант", qualification_kk: "Медициналық лаборант", qualification_en: "Medical Laboratory Technician",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
+  },
+  {
+    id: 8,
+    name_ru: "Гигиена и эпидемиология", name_kk: "Гигиена және эпидемиология", name_en: "Hygiene and Epidemiology",
+    qualification_ru: "Гигиенист-эпидемиолог", qualification_kk: "Гигиенист-эпидемиолог", qualification_en: "Hygienist-Epidemiologist",
+    duration_ru: "2 года 10 месяцев", duration_kk: "2 жыл 10 ай", duration_en: "2 years 10 months",
+    baseClass_ru: "9, 11 классы", baseClass_kk: "9, 11 сыныптар", baseClass_en: "Grades 9, 11"
   }
 ];
 
@@ -217,7 +225,7 @@ async function syncAndLoadDB() {
     const specsSnap = await db.collection("specialties").get();
     let specsList = [];
 
-    if (specsSnap.empty) {
+    if (specsSnap.empty || specsSnap.size < 7) {
       for (const spec of defaultSpecialties) {
         await db.collection("specialties").doc(String(spec.id)).set(spec);
       }
