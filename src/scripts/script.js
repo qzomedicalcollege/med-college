@@ -451,17 +451,20 @@ function renderHomePage() {
   const stats = document.querySelectorAll('.stat-num');
   const animateStats = () => {
     stats.forEach(stat => {
-      const target = parseInt(stat.getAttribute('data-target'));
-      const count = +stat.innerText.replace(/[^0-9]/g, '');
-      const speed = 100;
-      const inc = target / speed;
+      const updateCount = () => {
+        const target = parseInt(stat.getAttribute('data-target'));
+        const count = +stat.innerText.replace(/[^0-9]/g, '');
+        const speed = 100;
+        const inc = target / speed;
 
-      if (count < target) {
-        stat.innerText = Math.ceil(count + inc) + (stat.getAttribute('data-suffix') || '');
-        setTimeout(animateStats, 15);
-      } else {
-        stat.innerText = target + (stat.getAttribute('data-suffix') || '');
-      }
+        if (count < target) {
+          stat.innerText = Math.ceil(count + inc) + (stat.getAttribute('data-suffix') || '');
+          setTimeout(updateCount, 15);
+        } else {
+          stat.innerText = target + (stat.getAttribute('data-suffix') || '');
+        }
+      };
+      updateCount();
     });
   };
 
