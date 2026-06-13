@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import AdmissionsContent from '../../components/AdmissionsContent.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'kk' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title={lang === 'kk' ? 'Оқуға түсушілерге — ҚЖМК' : 'Admissions — KHMC'} lang={lang as any}>
+  <AdmissionsContent lang={lang} />
+</Layout>

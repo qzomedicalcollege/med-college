@@ -1,0 +1,129 @@
+---
+import { useTranslations } from '../i18n/utils';
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const base = '/med-college';
+---
+
+<!-- PAGE HERO -->
+<section class="section-padding" style="background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.04), rgba(var(--color-secondary-rgb), 0.04)); padding-top: 140px; padding-bottom: 60px;">
+  <div class="container text-center">
+    <h1 class="section-title">{t('nav.about')}</h1>
+    <p class="section-subtitle">
+      {lang === 'ru' 
+        ? 'Узнайте больше о нашей истории, руководстве колледжа и достижениях за 95 с лишним лет работы.' 
+        : lang === 'kk' 
+        ? '95 жылдан астам уақыт ішіндегі тарихымыз, колледж басшылығы мен жетістіктеріміз туралы көбірек біліңіз.' 
+        : 'Learn more about our history, college leadership, and achievements over 95 years of work.'}
+    </p>
+  </div>
+</section>
+
+<!-- HISTORY SECTION -->
+<section class="section-padding">
+  <div class="container about-split">
+    <div>
+      <h2 style="color: var(--color-primary); font-size: 2rem; margin-bottom: 20px; font-family: var(--font-title);">{t('about.history.title')}</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 16px; font-size: 1.05rem; line-height: 1.7;">{t('about.history.p1')}</p>
+      <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1.05rem; line-height: 1.7;">{t('about.history.p2')}</p>
+    </div>
+    <div style="position: relative;">
+      <div style="width: 100%; height: 350px; border-radius: var(--border-radius-lg); overflow: hidden; box-shadow: var(--shadow-xl); background-color: var(--bg-tertiary); display: flex; align-items: center; justify-content: center; border: 4px solid var(--bg-primary);">
+        <!-- History graphics -->
+        <svg viewBox="0 0 400 400" width="80%" height="80%" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="200" r="150" fill="var(--color-primary)" opacity="0.05"/>
+          <path d="M100 280 L200 120 L300 280 Z" fill="white" stroke="var(--color-primary)" stroke-width="4"/>
+          <circle cx="200" cy="120" r="10" fill="var(--color-secondary)"/>
+          <line x1="200" y1="130" x2="200" y2="280" stroke="var(--color-secondary)" stroke-width="4" stroke-dasharray="8 6"/>
+          <!-- Shield/Book -->
+          <rect x="160" y="200" width="80" height="60" rx="5" fill="var(--bg-secondary)" stroke="var(--color-primary)" stroke-width="3"/>
+          <line x1="200" y1="200" x2="200" y2="260" stroke="var(--color-primary)" stroke-width="2"/>
+          <path d="M175 220 H190 M175 235 H190 M210 220 H225 M210 235 H225" stroke="var(--text-tertiary)" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DIRECTOR GREETING -->
+<section class="section-padding" style="background-color: var(--bg-secondary);">
+  <div class="container">
+    <div class="director-section">
+      <div class="director-card glass-card">
+        <div class="director-img-container">
+          <!-- Official Director Profile SVG -->
+          <svg viewBox="0 0 100 100" fill="currentColor">
+            <circle cx="50" cy="40" r="20" fill="var(--color-primary)" opacity="0.8"/>
+            <path d="M20 80 C20 65 30 55 50 55 C70 55 80 65 80 80 Z" fill="var(--color-primary)"/>
+          </svg>
+        </div>
+        <div class="director-info">
+          <h3 id="director-name">{t('about.director.name')}</h3>
+          <p>{t('about.director.post')}</p>
+        </div>
+      </div>
+      <div class="director-speech">
+        <h2 style="font-family: var(--font-title); color: var(--color-primary); font-size: 2rem; margin-bottom: 24px;">{t('about.director.title')}</h2>
+        <blockquote id="director-greeting">
+          &ldquo;{t('about.director.speech')}&rdquo;
+        </blockquote>
+      </div>
+    </div>
+
+    <!-- Official Documents Box -->
+    <div class="glass-card" style="padding: 30px; margin-top: 48px;">
+      <h3 style="color: var(--color-primary); font-family: var(--font-title); margin-bottom: 20px;">
+        <i class="fas fa-file-pdf" style="color: var(--color-danger); margin-right: 8px;"></i>
+        {lang === 'ru' ? 'Официальные документы' : lang === 'kk' ? 'Ресми құжаттар' : 'Official Documents'}
+      </h3>
+      <div id="about-docs-list" class="docs-list-container"></div>
+    </div>
+  </div>
+</section>
+
+<!-- TIMELINE HISTORY -->
+<section class="section-padding">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">{t('about.timeline.title')}</h2>
+      <p class="section-subtitle">
+        {lang === 'ru' 
+          ? 'Посмотрите, как развивалось наше учебное заведение на протяжении почти века.' 
+          : lang === 'kk' 
+          ? 'Біздің оқу орнымыздың ғасырға жуық уақыт бойы қалай дамығанын көріңіз.' 
+          : 'See how our educational institution has developed over nearly a century.'}
+      </p>
+    </div>
+    
+    <div class="timeline">
+      <div class="timeline-item left-item">
+        <div class="timeline-card glass-card">
+          <div class="timeline-year">1928</div>
+          <p>{t('about.timeline.1928')}</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item right-item">
+        <div class="timeline-card glass-card">
+          <div class="timeline-year">1954</div>
+          <p>{t('about.timeline.1954')}</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item left-item">
+        <div class="timeline-card glass-card">
+          <div class="timeline-year">1996</div>
+          <p>{t('about.timeline.1996')}</p>
+        </div>
+      </div>
+      
+      <div class="timeline-item right-item">
+        <div class="timeline-card glass-card">
+          <div class="timeline-year">2018</div>
+          <p>{t('about.timeline.2018')}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

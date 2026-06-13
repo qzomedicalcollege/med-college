@@ -1,0 +1,205 @@
+---
+import { useTranslations } from '../i18n/utils';
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const base = '/med-college';
+
+const getLocalizedUrl = (targetLang: string, page: string) => {
+  const prefix = targetLang === 'ru' ? '' : `/${targetLang}`;
+  const suffix = page === '/' ? '' : page;
+  return `${base}${prefix}${suffix === '' ? '/' : suffix}`;
+};
+---
+
+<!-- HERO SECTION -->
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-content animate-slide">
+      <div class="hero-tag">
+        <i class="fas fa-award"></i> {t('hero.tag')}
+      </div>
+      <h1 class="hero-title">{t('hero.title1')} <br><span>{t('hero.title2')}</span></h1>
+      <p class="hero-desc">{t('hero.desc')}</p>
+      <div class="hero-buttons">
+        <a href={getLocalizedUrl(lang, '/admissions')} class="btn btn-primary">{t('hero.btn.docs')}</a>
+        <a href={getLocalizedUrl(lang, '/specialties')} class="btn btn-secondary">{t('hero.btn.specs')}</a>
+      </div>
+    </div>
+    <div class="hero-image-wrapper animate-fade">
+      <div class="hero-image-card">
+        <!-- Vector Medical college graphics (SVG) -->
+        <svg viewBox="0 0 400 400" width="100%" height="100%" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0a3d62" />
+              <stop offset="100%" stop-color="#00a896" />
+            </linearGradient>
+          </defs>
+          <circle cx="200" cy="200" r="160" fill="url(#grad1)" opacity="0.1" />
+          <circle cx="200" cy="200" r="120" fill="url(#grad1)" opacity="0.2" />
+          <path d="M100 320 H300 V180 L200 100 L100 180 Z" fill="white" stroke="url(#grad1)" stroke-width="6" />
+          <path d="M120 180 H280 V320 H120 Z" fill="#f8fafc" />
+          <!-- Windows of college building -->
+          <rect x="140" y="200" width="30" height="30" rx="3" fill="url(#grad1)" opacity="0.8"/>
+          <rect x="185" y="200" width="30" height="30" rx="3" fill="url(#grad1)" opacity="0.8"/>
+          <rect x="230" y="200" width="30" height="30" rx="3" fill="url(#grad1)" opacity="0.8"/>
+          <rect x="140" y="250" width="30" height="30" rx="3" fill="url(#grad1)" opacity="0.8"/>
+          <rect x="230" y="250" width="30" height="30" rx="3" fill="url(#grad1)" opacity="0.8"/>
+          <!-- Gate -->
+          <path d="M185 270 H215 V320 H185 Z" fill="url(#grad1)" />
+          <!-- Red Cross Symbol -->
+          <circle cx="200" cy="140" r="22" fill="#ef4444" />
+          <rect x="195" y="126" width="10" height="28" rx="2" fill="white"/>
+          <rect x="186" y="135" width="28" height="10" rx="2" fill="white"/>
+        </svg>
+      </div>
+      <!-- Floating details -->
+      <div class="hero-floating-badge hero-floating-badge-1">
+        <div class="hero-badge-icon"><i class="fas fa-stethoscope"></i></div>
+        <div class="hero-badge-text">
+          <p>{t('hero.badge.practice')}</p>
+          <p>{t('hero.badge.practice.desc')}</p>
+        </div>
+      </div>
+      <div class="hero-floating-badge hero-floating-badge-2">
+        <div class="hero-badge-icon"><i class="fas fa-user-graduate"></i></div>
+        <div class="hero-badge-text">
+          <p>{t('hero.badge.accred')}</p>
+          <p>{t('hero.badge.accred.desc')}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATISTICS BAR -->
+<section class="stats-bar">
+  <div class="container">
+    <div class="stats-grid glass-card">
+      <div class="stat-item">
+        <div class="stat-num" data-target="95" data-suffix="+">0</div>
+        <div class="stat-label">{t('stats.years')}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-target="15000" data-suffix="+">0</div>
+        <div class="stat-label">{t('stats.grads')}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-target="98" data-suffix="%">0</div>
+        <div class="stat-label">{t('stats.jobs')}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" data-target="7" data-suffix="">0</div>
+        <div class="stat-label">{t('stats.specs')}</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS FEED SECTION -->
+<section class="section-padding" style="background-color: var(--bg-secondary);">
+  <div class="container">
+    <div class="text-center">
+      <h2 class="section-title">{t('title.news')}</h2>
+      <p class="section-subtitle">{t('subtitle.news')}</p>
+    </div>
+    <!-- Rendered dynamically by script.js -->
+    <div class="news-grid" id="news-grid">
+      <!-- News items go here -->
+    </div>
+  </div>
+</section>
+
+<!-- WHY CHOOSE US -->
+<section class="section-padding">
+  <div class="container about-split">
+    <div class="about-info">
+      <h2 class="section-title">{t('title.features')}</h2>
+      <p class="section-subtitle" style="margin-left: 0; text-align: left; margin-bottom: 24px;">{t('subtitle.features')}</p>
+      <p style="color: var(--text-secondary); margin-bottom: 30px;">
+        {lang === 'ru' 
+          ? 'Студенты колледжа занимаются в учебных кабинетах, оснащенных инновационным симуляционным оборудованием, проходят практику в лучших больницах и поликлиниках Кызылординской области и имеют доступ к обширной цифровой библиотеке.' 
+          : lang === 'kk' 
+          ? 'Колледж студенттері инновациялық симуляциялық жабдықтармен жарақтандырылған оқу кабинеттерінде білім алады, Қызылорда облысының ең үздік ауруханалары мен емханаларында тәжірибеден өтеді және бай цифрлық кітапханаға қол жеткізе алады.' 
+          : 'College students study in classrooms equipped with innovative simulation equipment, undergo clinical practice in the best hospitals and clinics of the Kyzylorda region, and have access to an extensive digital library.'}
+      </p>
+      <a href={getLocalizedUrl(lang, '/about')} class="btn btn-outline">{t('btn.more')}</a>
+    </div>
+    <div class="about-features">
+      <div class="feature-box glass-card">
+        <div class="feature-icon"><i class="fas fa-laptop-medical"></i></div>
+        <h4>{lang === 'ru' ? 'Симуляционный центр' : lang === 'kk' ? 'Симуляциялық орталық' : 'Simulation Center'}</h4>
+        <p>
+          {lang === 'ru' 
+            ? 'Отработка практических навыков на умных манекенах перед практикой с пациентами.' 
+            : lang === 'kk' 
+            ? 'Пациенттермен тәжірибе жасамас бұрын ақылды манекендерде практикалық дағдыларды шыңдау.' 
+            : 'Developing practical skills on smart mannequins before practicing with actual patients.'}
+        </p>
+      </div>
+      <div class="feature-box glass-card">
+        <div class="feature-icon"><i class="fas fa-handshake"></i></div>
+        <h4>{lang === 'ru' ? 'Партнерство с клиниками' : lang === 'kk' ? 'Клиникалармен серіктестік' : 'Clinic Partnerships'}</h4>
+        <p>
+          {lang === 'ru' 
+            ? 'Гарантированное прохождение клинической практики в медицинских учреждениях города.' 
+            : lang === 'kk' 
+            ? 'Қаланың медициналық мекемелерінде кепілді клиникалық тәжірибеден өту.' 
+            : 'Guaranteed clinical practice in medical institutions and clinics of the city.'}
+        </p>
+      </div>
+      <div class="feature-box glass-card">
+        <div class="feature-icon"><i class="fas fa-users"></i></div>
+        <h4>{lang === 'ru' ? 'Опытные преподаватели' : lang === 'kk' ? 'Тәжірибелі оқытушылар' : 'Experienced Faculty'}</h4>
+        <p>
+          {lang === 'ru' 
+            ? 'Занятия ведут врачи высшей категории, магистры медицины и отличники здравоохранения.' 
+            : lang === 'kk' 
+            ? 'Сабақтарды жоғары санатты дәрігерлер, медицина магистрлері және денсаулық сақтау ісінің үздіктері жүргізеді.' 
+            : 'Classes are taught by doctors of the highest category, masters of medicine, and healthcare awardees.'}
+        </p>
+      </div>
+      <div class="feature-box glass-card">
+        <div class="feature-icon"><i class="fas fa-hotel"></i></div>
+        <h4>{lang === 'ru' ? 'Общежитие' : lang === 'kk' ? 'Жатақхана' : 'Dormitory'}</h4>
+        <p>
+          {lang === 'ru' 
+            ? 'Комфортабельное студенческое общежитие для иногородних студентов с современными условиями.' 
+            : lang === 'kk' 
+            ? 'Басқа қаладан келген студенттерге арналған заманауи жағдайлары бар жайлы студенттер жатақханасы.' 
+            : 'Comfortable student dormitory with modern amenities for out-of-town students.'}
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA ADMISSION -->
+<section class="section-padding text-center" style="background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.95), rgba(var(--color-secondary-rgb), 0.95)); color: white; position: relative; overflow: hidden;">
+  <div class="container animate-slide" style="position: relative; z-index: 10;">
+    <h2 style="font-size: 2.5rem; margin-bottom: 20px; font-family: var(--font-title); color: white;">
+      {lang === 'ru' 
+        ? 'Хотите стать частью медицинского сообщества?' 
+        : lang === 'kk' 
+        ? 'Медициналық қауымдастықтың бір бөлігі болғыңыз келе ме?' 
+        : 'Want to become part of the medical community?'}
+    </h2>
+    <p style="font-size: 1.15rem; max-width: 700px; margin: 0 auto 36px; opacity: 0.9;">
+      {lang === 'ru' 
+        ? 'Подайте документы в Кызылординский высший медицинский колледж онлайн через SmartNation или посетите нашу приемную комиссию лично.' 
+        : lang === 'kk' 
+        ? 'Құжаттарыңызды Қызылорда жоғары медициналық колледжіне SmartNation арқылы онлайн тапсырыңыз немесе қабылдау комиссиясына жеке келіңіз.' 
+        : 'Submit your documents to the Kyzylorda Higher Medical College online via SmartNation or visit our admissions office in person.'}
+    </p>
+    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+      <a href={getLocalizedUrl(lang, '/admissions')} class="btn btn-secondary" style="background-color: var(--color-accent); color: #1e293b;">{lang === 'ru' ? 'Пошаговый гид поступления' : lang === 'kk' ? 'Оқуға түсу қадамдары' : 'Admission Step-by-Step Guide'}</a>
+      <a href="https://college.smartnation.kz/kz/tko" target="_blank" class="btn btn-outline smartnation-btn" style="border-color: white; color: white;">{lang === 'ru' ? 'Подать через SmartNation' : lang === 'kk' ? 'SmartNation арқылы тапсыру' : 'Apply via SmartNation'}</a>
+    </div>
+  </div>
+  <!-- Decorative SVG background lines -->
+  <svg style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0.05;" viewBox="0 0 1000 300" fill="none">
+    <path d="M-100 150 C200 300 400 0 600 150 C800 300 1000 100 1200 150" stroke="white" stroke-width="4" />
+    <path d="M-100 200 C200 350 400 50 600 200 C800 350 1000 150 1200 200" stroke="white" stroke-width="4" />
+  </svg>
+</section>

@@ -1,0 +1,693 @@
+---
+import '../../style.css';
+const base = '/med-college';
+---
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Панель Администратора — КВМК</title>
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Firebase v8 SDK (Global scripts for client-side use) -->
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script is:inline src="/med-college/firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- 1. LOGIN SCREEN -->
+  <div class="admin-login-wrapper" id="login-screen">
+    <div class="login-card glass-card">
+      <div class="login-logo">
+        <img src={`${base}/logo.png`} alt="Логотип КВМК" class="logo-img" style="margin: 0 auto 12px; display: block;">
+        <h2 style="color: var(--color-primary); margin-top: 10px;">Панель управления</h2>
+        <p style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 1px;">Высший Медколледж</p>
+      </div>
+      <form id="login-form">
+        <div class="form-group">
+          <label for="login-user">Email администратора</label>
+          <input type="email" id="login-user" class="form-control" placeholder="example@mail.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="login-pass">Пароль</label>
+          <input type="password" id="login-pass" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <div id="login-error" style="color: var(--color-danger); font-size: 0.85rem; margin-bottom: 15px; display: none;">
+          Неверное имя пользователя или пароль!
+        </div>
+        <button type="submit" class="btn btn-primary" style="width: 100%;">Войти в систему</button>
+      </form>
+      <div style="text-align: center; margin-top: 24px;">
+        <a href={`${base}/`} style="font-size: 0.9rem; color: var(--color-secondary);"><i class="fas fa-arrow-left"></i> На главную страницу</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. MAIN ADMIN DASHBOARD LAYOUT (Hidden by default) -->
+  <div class="admin-layout" id="admin-panel" style="display: none;">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <a href={`${base}/`} class="logo-container">
+        <img src={`${base}/logo.png`} alt="Логотип КВМК" class="logo-img">
+        <div class="logo-text">
+          <h2 style="color: var(--color-primary);">КВМК</h2>
+          <p>Панель управления</p>
+        </div>
+      </a>
+      
+      <div class="admin-menu">
+        <div class="admin-menu-item active" data-tab="dashboard">
+          <i class="fas fa-chart-pie"></i> Дашборд
+        </div>
+        <div class="admin-menu-item" data-tab="news">
+          <i class="fas fa-newspaper"></i> Новости
+        </div>
+        <div class="admin-menu-item" data-tab="specialties">
+          <i class="fas fa-graduation-cap"></i> Специальности
+        </div>
+        <div class="admin-menu-item" data-tab="documents">
+          <i class="fas fa-folder-open"></i> Документы
+        </div>
+        <div class="admin-menu-item" data-tab="messages">
+          <i class="fas fa-envelope"></i> Сообщения
+        </div>
+        <div class="admin-menu-item" data-tab="settings">
+          <i class="fas fa-cog"></i> Настройки сайта
+        </div>
+        
+        <div class="admin-menu-item theme-toggle-btn" style="margin-top: 24px;">
+          <i class="fas fa-adjust"></i> Сменить тему
+        </div>
+        
+        <div class="admin-menu-item admin-logout" id="logout-btn">
+          <i class="fas fa-sign-out-alt"></i> Выйти
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="admin-main">
+      <!-- Top header -->
+      <header class="admin-header">
+        <div>
+          <h1 id="admin-tab-title" style="font-size: 1.8rem; color: var(--color-primary);">Панель управления</h1>
+          <p style="color: var(--text-tertiary); font-size: 0.9rem;">Добро пожаловать в административную панель колледжа.</p>
+        </div>
+        <div class="admin-user">
+          <div class="admin-avatar">A</div>
+          <div>
+            <h4 style="font-size: 0.95rem;">Администратор</h4>
+            <p style="font-size: 0.75rem; color: var(--text-tertiary);">Роль: Главный редактор</p>
+          </div>
+        </div>
+      </header>
+
+      <!-- TAB 1: DASHBOARD STATS -->
+      <div class="admin-tab-content" id="tab-dashboard">
+        <div class="admin-stats-grid">
+          <div class="admin-stat-card glass-card">
+            <div class="admin-stat-info">
+              <h3 id="stat-news-count">0</h3>
+              <p>Новостей опубликовано</p>
+            </div>
+            <div class="admin-stat-icon stat-icon-blue"><i class="fas fa-newspaper"></i></div>
+          </div>
+          <div class="admin-stat-card glass-card">
+            <div class="admin-stat-info">
+              <h3 id="stat-spec-count">0</h3>
+              <p>Направлений обучения</p>
+            </div>
+            <div class="admin-stat-icon stat-icon-teal"><i class="fas fa-graduation-cap"></i></div>
+          </div>
+          <div class="admin-stat-card glass-card">
+            <div class="admin-stat-info">
+              <h3 id="stat-msg-count">0</h3>
+              <p>Новых сообщений</p>
+            </div>
+            <div class="admin-stat-icon stat-icon-amber"><i class="fas fa-envelope"></i></div>
+          </div>
+          <div class="admin-stat-card glass-card">
+            <div class="admin-stat-info">
+              <h3 id="stat-total-msg">0</h3>
+              <p>Всего обращений</p>
+            </div>
+            <div class="admin-stat-icon stat-icon-green"><i class="fas fa-inbox"></i></div>
+          </div>
+          <div class="admin-stat-card glass-card">
+            <div class="admin-stat-info">
+              <h3 id="stat-doc-count">0</h3>
+              <p>Документов загружено</p>
+            </div>
+            <div class="admin-stat-icon stat-icon-amber" style="background-color: rgba(223, 177, 91, 0.1); color: var(--color-accent);"><i class="fas fa-file-pdf"></i></div>
+          </div>
+        </div>
+
+        <div class="glass-card" style="padding: 24px;">
+          <h3 style="margin-bottom: 16px; color: var(--color-primary);">Последние входящие сообщения</h3>
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Имя</th>
+                  <th>Телефон</th>
+                  <th>Тема</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="recent-messages-body">
+                <!-- Injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: NEWS CRUD -->
+      <div class="admin-tab-content" id="tab-news" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="color: var(--color-primary);">Список новостей на сайте</h3>
+          <button class="btn btn-primary btn-sm" onclick="openAddNewsModal()"><i class="fas fa-plus"></i> Добавить новость</button>
+        </div>
+        <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Заголовок (RU)</th>
+                  <th>Категория</th>
+                  <th>Дата</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="admin-news-body">
+                <!-- News list injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: SPECIALTIES CRUD -->
+      <div class="admin-tab-content" id="tab-specialties" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="color: var(--color-primary);">Перечень направлений подготовки</h3>
+          <button class="btn btn-primary btn-sm" onclick="openAddSpecModal()"><i class="fas fa-plus"></i> Добавить специальность</button>
+        </div>
+        <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Специальность (RU)</th>
+                  <th>Квалификация (RU)</th>
+                  <th>База (RU)</th>
+                  <th>Срок обучения (RU)</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="admin-specs-body">
+                <!-- Specialties injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 4: MESSAGES INBOX -->
+      <div class="admin-tab-content" id="tab-messages" style="display: none;">
+        <h3 style="color: var(--color-primary); margin-bottom: 24px;">Входящие обращения</h3>
+        <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Дата</th>
+                  <th>Имя абитуриента</th>
+                  <th>Контакты</th>
+                  <th>Тема вопроса</th>
+                  <th>Сообщение</th>
+                  <th>Статус</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="admin-messages-body">
+                <!-- Message inbox injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: DOCUMENTS CRUD -->
+      <div class="admin-tab-content" id="tab-documents" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <h3 style="color: var(--color-primary);">Официальные и полезные документы</h3>
+          <button class="btn btn-primary btn-sm" onclick="openAddDocModal()"><i class="fas fa-plus"></i> Добавить документ</button>
+        </div>
+        <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-container">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Название (RU)</th>
+                  <th>Имя файла</th>
+                  <th>MIME-Тип</th>
+                  <th>Раздел</th>
+                  <th>Действия</th>
+                </tr>
+              </thead>
+              <tbody id="admin-docs-body">
+                <!-- Documents list injected dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: WEBSITE SETTINGS -->
+      <div class="admin-tab-content" id="tab-settings" style="display: none;">
+        <h3 style="color: var(--color-primary); margin-bottom: 24px;">Глобальные настройки колледжа</h3>
+        <div class="glass-card" style="padding: 30px;">
+          <form id="admin-settings-form">
+            <!-- Global Fields -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label for="set-phone">Телефон приемной комиссии</label>
+                <input type="text" id="set-phone" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-email">Email колледжа</label>
+                <input type="email" id="set-email" class="form-control" required>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+              <div class="form-group">
+                <label for="set-smartnation">Портал SmartNation</label>
+                <input type="url" id="set-smartnation" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-insta">Instagram ссылка</label>
+                <input type="url" id="set-insta" class="form-control" required>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px;">
+              <div class="form-group">
+                <label for="set-fb">Facebook ссылка</label>
+                <input type="url" id="set-fb" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-youtube">YouTube канал</label>
+                <input type="url" id="set-youtube" class="form-control" required>
+              </div>
+            </div>
+
+            <!-- Tabs selector for settings translations -->
+            <div class="form-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+              <button type="button" class="form-tab-btn active" onclick="switchSettingsTab(this, 'ru')">Русский (RU)</button>
+              <button type="button" class="form-tab-btn" onclick="switchSettingsTab(this, 'kk')">Қазақша (KK)</button>
+              <button type="button" class="form-tab-btn" onclick="switchSettingsTab(this, 'en')">English (EN)</button>
+            </div>
+
+            <!-- Settings RU Content -->
+            <div class="settings-tab-content lang-ru active">
+              <div class="form-group">
+                <label for="set-address-ru">Адрес колледжа (RU)</label>
+                <input type="text" id="set-address-ru" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-dir-name-ru">ФИО Директора (RU)</label>
+                <input type="text" id="set-dir-name-ru" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label for="set-dir-speech-ru">Приветственное слово директора (RU)</label>
+                <textarea id="set-dir-speech-ru" class="form-control" rows="4" required></textarea>
+              </div>
+            </div>
+
+            <!-- Settings KK Content -->
+            <div class="settings-tab-content lang-kk">
+              <div class="form-group">
+                <label for="set-address-kk">Адрес колледжа (KK)</label>
+                <input type="text" id="set-address-kk" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="set-dir-name-kk">ФИО Директора (KK)</label>
+                <input type="text" id="set-dir-name-kk" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="set-dir-speech-kk">Приветственное слово директора (KK)</label>
+                <textarea id="set-dir-speech-kk" class="form-control" rows="4"></textarea>
+              </div>
+            </div>
+
+            <!-- Settings EN Content -->
+            <div class="settings-tab-content lang-en">
+              <div class="form-group">
+                <label for="set-address-en">Адрес колледжа (EN)</label>
+                <input type="text" id="set-address-en" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="set-dir-name-en">ФИО Директора (EN)</label>
+                <input type="text" id="set-dir-name-en" class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="set-dir-speech-en">Приветственное слово директора (EN)</label>
+                <textarea id="set-dir-speech-en" class="form-control" rows="4"></textarea>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="margin-top: 20px;"><i class="fas fa-save"></i> Сохранить настройки</button>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 3. NEWS ADD/EDIT MODAL -->
+  <div class="modal-overlay" id="admin-news-modal">
+    <div class="modal-content glass-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="news-modal-title" style="color: var(--color-primary);">Добавить новость</h3>
+        <span class="modal-close" onclick="closeNewsAdminModal()">&times;</span>
+      </div>
+      <form id="admin-news-form">
+        <input type="hidden" id="news-edit-id">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="news-category">Категория</label>
+            <select id="news-category" class="form-control">
+              <option value="События">События</option>
+              <option value="Образование">Образование</option>
+              <option value="Абитуриенту">Абитуриенту</option>
+              <option value="Объявления">Объявления</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="news-date">Дата публикации</label>
+            <input type="date" id="news-date" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="news-image-file">Изображение новости</label>
+          <input type="file" id="news-image-file" class="form-control" accept="image/*">
+          <input type="hidden" id="news-image-base64">
+        </div>
+
+        <!-- Tabs selector for news translation -->
+        <div class="form-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <button type="button" class="form-tab-btn active" onclick="switchNewsTab(this, 'ru')">Русский (RU)</button>
+          <button type="button" class="form-tab-btn" onclick="switchNewsTab(this, 'kk')">Қазақша (KK)</button>
+          <button type="button" class="form-tab-btn" onclick="switchNewsTab(this, 'en')">English (EN)</button>
+        </div>
+
+        <!-- News RU fields -->
+        <div class="news-tab-content lang-ru active">
+          <div class="form-group">
+            <label for="news-title-ru">Заголовок новости (RU)</label>
+            <input type="text" id="news-title-ru" class="form-control" required>
+          </div>
+          <div class="form-group">
+            <label for="news-short-ru">Краткое описание (RU)</label>
+            <textarea id="news-short-ru" class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="news-full-ru">Полный текст новости (RU)</label>
+            <textarea id="news-full-ru" class="form-control" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <!-- News KK fields -->
+        <div class="news-tab-content lang-kk">
+          <div class="form-group">
+            <label for="news-title-kk">Заголовок новости (KK)</label>
+            <input type="text" id="news-title-kk" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="news-short-kk">Краткое описание (KK)</label>
+            <textarea id="news-short-kk" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="news-full-kk">Полный текст новости (KK)</label>
+            <textarea id="news-full-kk" class="form-control" rows="4"></textarea>
+          </div>
+        </div>
+
+        <!-- News EN fields -->
+        <div class="news-tab-content lang-en">
+          <div class="form-group">
+            <label for="news-title-en">Заголовок новости (EN)</label>
+            <input type="text" id="news-title-en" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="news-short-en">Краткое описание (EN)</label>
+            <textarea id="news-short-en" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="news-full-en">Полный текст новости (EN)</label>
+            <textarea id="news-full-en" class="form-control" rows="4"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Сохранить новость</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. SPECIALTY ADD/EDIT MODAL -->
+  <div class="modal-overlay" id="admin-spec-modal">
+    <div class="modal-content glass-card" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 id="spec-modal-title" style="color: var(--color-primary);">Добавить специальность</h3>
+        <span class="modal-close" onclick="closeSpecAdminModal()">&times;</span>
+      </div>
+      <form id="admin-spec-form">
+        <input type="hidden" id="spec-edit-id">
+
+        <!-- Tabs selector for spec translation -->
+        <div class="form-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <button type="button" class="form-tab-btn active" onclick="switchSpecTab(this, 'ru')">Русский (RU)</button>
+          <button type="button" class="form-tab-btn" onclick="switchSpecTab(this, 'kk')">Қазақша (KK)</button>
+          <button type="button" class="form-tab-btn" onclick="switchSpecTab(this, 'en')">English (EN)</button>
+        </div>
+
+        <!-- Spec RU fields -->
+        <div class="spec-tab-content lang-ru active">
+          <div class="form-group">
+            <label for="spec-name-ru">Название специальности (RU)</label>
+            <input type="text" id="spec-name-ru" class="form-control" placeholder="Лечебное дело" required>
+          </div>
+          <div class="form-group">
+            <label for="spec-qual-ru">Квалификация (RU)</label>
+            <input type="text" id="spec-qual-ru" class="form-control" placeholder="Фельдшер" required>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="spec-base-ru">База образования (RU)</label>
+              <input type="text" id="spec-base-ru" class="form-control" placeholder="9, 11 классы" required>
+            </div>
+            <div class="form-group">
+              <label for="spec-duration-ru">Срок обучения (RU)</label>
+              <input type="text" id="spec-duration-ru" class="form-control" placeholder="2 года 10 месяцев" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="spec-desc-ru">Краткое описание (RU)</label>
+            <textarea id="spec-desc-ru" class="form-control" rows="2" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-details-ru">Подробности/Сферы работы (RU)</label>
+            <textarea id="spec-details-ru" class="form-control" rows="3" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-subjects-ru">Профильные предметы (RU)</label>
+            <textarea id="spec-subjects-ru" class="form-control" rows="2" required></textarea>
+          </div>
+        </div>
+
+        <!-- Spec KK fields -->
+        <div class="spec-tab-content lang-kk">
+          <div class="form-group">
+            <label for="spec-name-kk">Название специальности (KK)</label>
+            <input type="text" id="spec-name-kk" class="form-control" placeholder="Емдеу ісі">
+          </div>
+          <div class="form-group">
+            <label for="spec-qual-kk">Квалификация (KK)</label>
+            <input type="text" id="spec-qual-kk" class="form-control" placeholder="Фельдшер">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="spec-base-kk">База образования (KK)</label>
+              <input type="text" id="spec-base-kk" class="form-control" placeholder="9, 11 сыныптар">
+            </div>
+            <div class="form-group">
+              <label for="spec-duration-kk">Срок обучения (KK)</label>
+              <input type="text" id="spec-duration-kk" class="form-control" placeholder="2 жыл 10 ай">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="spec-desc-kk">Краткое описание (KK)</label>
+            <textarea id="spec-desc-kk" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-details-kk">Подробности/Сферы работы (KK)</label>
+            <textarea id="spec-details-kk" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-subjects-kk">Профильные предметы (KK)</label>
+            <textarea id="spec-subjects-kk" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+
+        <!-- Spec EN fields -->
+        <div class="spec-tab-content lang-en">
+          <div class="form-group">
+            <label for="spec-name-en">Название специальности (EN)</label>
+            <input type="text" id="spec-name-en" class="form-control" placeholder="General Medicine">
+          </div>
+          <div class="form-group">
+            <label for="spec-qual-en">Квалификация (EN)</label>
+            <input type="text" id="spec-qual-en" class="form-control" placeholder="Physician Assistant">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-group">
+              <label for="spec-base-en">База образования (EN)</label>
+              <input type="text" id="spec-base-en" class="form-control" placeholder="Grades 9, 11">
+            </div>
+            <div class="form-group">
+              <label for="spec-duration-en">Срок обучения (EN)</label>
+              <input type="text" id="spec-duration-en" class="form-control" placeholder="2 years 10 months">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="spec-desc-en">Краткое описание (EN)</label>
+            <textarea id="spec-desc-en" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-details-en">Подробности/Сферы работы (EN)</label>
+            <textarea id="spec-details-en" class="form-control" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="spec-subjects-en">Профильные предметы (EN)</label>
+            <textarea id="spec-subjects-en" class="form-control" rows="2"></textarea>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Сохранить специальность</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. DOCUMENT ADD/EDIT MODAL -->
+  <div class="modal-overlay" id="admin-doc-modal">
+    <div class="modal-content glass-card" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3 id="doc-modal-title" style="color: var(--color-primary);">Добавить документ</h3>
+        <span class="modal-close" onclick="closeDocAdminModal()">&times;</span>
+      </div>
+      <form id="admin-doc-form">
+        <input type="hidden" id="doc-edit-id">
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 15px;">
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="doc-category">Раздел размещения</label>
+            <select id="doc-category" class="form-control">
+              <option value="general">Официальные документы (О колледже)</option>
+              <option value="admission">Материалы для скачивания (Поступающим)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label for="doc-file-input">Файл документа (до 1 МБ)</label>
+            <input type="file" id="doc-file-input" class="form-control" accept=".pdf,.doc,.docx,.xls,.xlsx" required>
+            <input type="hidden" id="doc-file-base64">
+            <input type="hidden" id="doc-file-name">
+            <input type="hidden" id="doc-file-type">
+          </div>
+        </div>
+
+        <!-- Tabs selector for doc translation -->
+        <div class="form-tabs" style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">
+          <button type="button" class="form-tab-btn active" onclick="switchDocTab(this, 'ru')">Русский (RU)</button>
+          <button type="button" class="form-tab-btn" onclick="switchDocTab(this, 'kk')">Қазақша (KK)</button>
+          <button type="button" class="form-tab-btn" onclick="switchDocTab(this, 'en')">English (EN)</button>
+        </div>
+
+        <!-- Doc RU fields -->
+        <div class="doc-tab-content lang-ru active">
+          <div class="form-group">
+            <label for="doc-name-ru">Название документа (RU) *</label>
+            <input type="text" id="doc-name-ru" class="form-control" required placeholder="Например: Устав колледжа">
+          </div>
+        </div>
+
+        <!-- Doc KK fields -->
+        <div class="doc-tab-content lang-kk">
+          <div class="form-group">
+            <label for="doc-name-kk">Название документа (KK)</label>
+            <input type="text" id="doc-name-kk" class="form-control" placeholder="Например: Колледж жарғысы">
+          </div>
+        </div>
+
+        <!-- Doc EN fields -->
+        <div class="doc-tab-content lang-en">
+          <div class="form-group">
+            <label for="doc-name-en">Название документа (EN)</label>
+            <input type="text" id="doc-name-en" class="form-control" placeholder="Например: College Charter">
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Сохранить документ</button>
+      </form>
+    </div>
+  </div>
+
+  <script is:inline>
+    // Tab switching helpers inside form dialogs
+    window.switchSettingsTab = function(btn, langCode) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.form-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.settings-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.settings-tab-content.lang-${langCode}`).classList.add('active');
+    };
+
+    window.switchNewsTab = function(btn, langCode) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.form-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.news-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.news-tab-content.lang-${langCode}`).classList.add('active');
+    };
+
+    window.switchSpecTab = function(btn, langCode) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.form-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.spec-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.spec-tab-content.lang-${langCode}`).classList.add('active');
+    };
+
+    window.switchDocTab = function(btn, langCode) {
+      const parent = btn.parentElement;
+      parent.querySelectorAll('.form-tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.doc-tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector(`.doc-tab-content.lang-${langCode}`).classList.add('active');
+    };
+  </script>
+
+  <!-- Load admin controllers -->
+  <script src="../scripts/script.js"></script>
+  <script src="../scripts/admin.js"></script>
+</body>
+</html>

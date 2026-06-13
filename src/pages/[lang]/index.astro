@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import HomeContent from '../../components/HomeContent.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'kk' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title={lang === 'kk' ? 'Қызылорда жоғары медициналық колледжі — Басты бет' : 'Kyzylorda Higher Medical College — Home'} lang={lang as any}>
+  <HomeContent lang={lang} />
+</Layout>

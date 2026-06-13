@@ -1,0 +1,178 @@
+---
+import { useTranslations } from '../i18n/utils';
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<!-- PAGE HERO -->
+<section class="section-padding" style="background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.04), rgba(var(--color-secondary-rgb), 0.04)); padding-top: 140px; padding-bottom: 60px;">
+  <div class="container text-center">
+    <h1 class="section-title">{t('title.admissions')}</h1>
+    <p class="section-subtitle">{t('subtitle.admissions')}</p>
+  </div>
+</section>
+
+<!-- ADMISSIONS CONTENT -->
+<section class="section-padding">
+  <div class="container admissions-split">
+    
+    <!-- Left Column: Steps & Documents -->
+    <div>
+      <h2 style="color: var(--color-primary); font-size: 1.8rem; margin-bottom: 24px; font-family: var(--font-title);">{t('admission.steps')}</h2>
+      <div class="timeline-steps">
+        <div class="step-card glass-card">
+          <div class="step-number">1</div>
+          <div class="step-info">
+            <h3>{t('admission.step1.title')}</h3>
+            <p>{t('admission.step1.desc')}</p>
+          </div>
+        </div>
+        
+        <div class="step-card glass-card">
+          <div class="step-number">2</div>
+          <div class="step-info">
+            <h3>{t('admission.step2.title')}</h3>
+            <p>{t('admission.step2.desc')}</p>
+          </div>
+        </div>
+        
+        <div class="step-card glass-card">
+          <div class="step-number">3</div>
+          <div class="step-info">
+            <h3>{t('admission.step3.title')}</h3>
+            <p>{t('admission.step3.desc')}</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Documents Checklist -->
+      <div class="docs-card glass-card">
+        <h3 style="color: var(--color-primary); font-family: var(--font-title); display: flex; align-items: center; gap: 10px; font-size: 1.4rem;">
+          <i class="fas fa-file-invoice" style="color: var(--color-secondary);"></i> {t('docs.title')}
+        </h3>
+        <p style="color: var(--text-secondary); font-size: 0.95rem; margin-top: 6px;">{t('docs.desc')}</p>
+        <div class="docs-checklist">
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item1')}</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item2')}</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item3')}</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item4')}</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item5')}</span>
+          </label>
+          <label class="checklist-item">
+            <input type="checkbox">
+            <span>{t('docs.item6')}</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Downloadable Materials -->
+      <div class="glass-card" style="padding: 30px; margin-top: 30px;">
+        <h3 style="color: var(--color-primary); font-family: var(--font-title); margin-bottom: 16px;">
+          <i class="fas fa-download" style="color: var(--color-secondary); margin-right: 8px;"></i>
+          {lang === 'ru' ? 'Материалы для скачивания' : lang === 'kk' ? 'Жүктеп алуға арналған материалдар' : 'Downloadable Materials'}
+        </h3>
+        <div id="admission-docs-list" class="docs-list-container"></div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Calculator -->
+    <div>
+      <div class="calculator-card glass-card">
+        <h3><i class="fas fa-calculator"></i> {t('calc.title')}</h3>
+        <form id="calc-form">
+          <div class="form-group">
+            <label>{t('calc.label.avg')}</label>
+            <input type="number" id="score-math" class="form-control" placeholder={lang === 'ru' ? 'Математика' : lang === 'kk' ? 'Математика' : 'Mathematics'} min="2" max="5" step="0.1" required style="margin-bottom: 8px;">
+            <input type="number" id="score-bio" class="form-control" placeholder={lang === 'ru' ? 'Биология' : lang === 'kk' ? 'Биология' : 'Biology'} min="2" max="5" step="0.1" required style="margin-bottom: 8px;">
+            <input type="number" id="score-lang" class="form-control" placeholder={lang === 'ru' ? 'Язык обучения' : lang === 'kk' ? 'Оқыту тілі' : 'Language'} min="2" max="5" step="0.1" required style="margin-bottom: 8px;">
+            <input type="number" id="score-hist" class="form-control" placeholder={lang === 'ru' ? 'История Казахстана' : lang === 'kk' ? 'Қазақстан тарихы' : 'History of KZ'} min="2" max="5" step="0.1" required>
+          </div>
+          <div class="form-group">
+            <label>{t('calc.label.base')}</label>
+            <select id="calc-base" class="form-control" required>
+              <option value="9">{t('calc.base.9')}</option>
+              <option value="11">{t('calc.base.11')}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>{t('calc.label.spec')}</label>
+            <select id="calc-spec" class="form-control" required>
+              <option value="med">{lang === 'ru' ? 'Лечебное дело (Фельдшер)' : lang === 'kk' ? 'Емдеу ісі (Фельдшер)' : 'General Medicine (Physician Assistant)'}</option>
+              <option value="nurse">{lang === 'ru' ? 'Сестринское дело (Медсестра)' : lang === 'kk' ? 'Бикеш ісі (Медбике)' : 'Nursing Care (Nurse)'}</option>
+              <option value="pharm">{lang === 'ru' ? 'Фармация (Фармацевт)' : lang === 'kk' ? 'Фармация (Фармацевт)' : 'Pharmacy (Pharmacist)'}</option>
+              <option value="dentist">{lang === 'ru' ? 'Стоматология' : lang === 'kk' ? 'Стоматология' : 'Dentistry'}</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary calc-btn">{t('calc.btn')}</button>
+        </form>
+        
+        <div class="calc-result" id="calc-result">
+          <h4>{t('calc.result.title')}</h4>
+          <p>{t('calc.result.score')} <span class="score-val">0.00</span></p>
+          <span class="chance-badge"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- FAQ SECTION -->
+  <div class="container" style="margin-top: 60px;">
+    <h2 class="text-center" style="font-family: var(--font-title); color: var(--color-primary); font-size: 2rem;">{t('faq.title')}</h2>
+    <div class="faq-accordion">
+      <div class="faq-item">
+        <div class="faq-header">
+          <span>{t('faq.q1')}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-body">
+          <p>{t('faq.a1')}</p>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-header">
+          <span>{t('faq.q2')}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-body">
+          <p>{t('faq.a2')}</p>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-header">
+          <span>{t('faq.q3')}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-body">
+          <p>{t('faq.a3')}</p>
+        </div>
+      </div>
+      
+      <div class="faq-item">
+        <div class="faq-header">
+          <span>{t('faq.q4')}</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+        <div class="faq-body">
+          <p>{t('faq.a4')}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

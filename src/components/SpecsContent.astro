@@ -1,0 +1,41 @@
+---
+import { useTranslations } from '../i18n/utils';
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<!-- PAGE HERO -->
+<section class="section-padding" style="background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.04), rgba(var(--color-secondary-rgb), 0.04)); padding-top: 140px; padding-bottom: 60px;">
+  <div class="container text-center">
+    <h1 class="section-title">{t('title.specialties')}</h1>
+    <p class="section-subtitle">{t('subtitle.specialties')}</p>
+  </div>
+</section>
+
+<!-- CATALOGUE SECTION -->
+<section class="section-padding">
+  <div class="container">
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" data-filter="all">
+        {lang === 'ru' ? 'Все направления' : lang === 'kk' ? 'Барлық бағыттар' : 'All Programs'}
+      </button>
+      <button class="filter-btn" data-filter="9class">
+        {t('calc.base.9')}
+      </button>
+      <button class="filter-btn" data-filter="11class">
+        {t('calc.base.11')}
+      </button>
+    </div>
+
+    <!-- Grid Container (injected dynamically by script.js) -->
+    <div class="specs-grid" id="specs-grid">
+      <!-- Loading skeleton / placeholder -->
+      <div class="text-center" style="grid-column: 1/-1; color: var(--text-tertiary);">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 12px;"></i>
+        <p>{lang === 'ru' ? 'Загрузка специальностей...' : lang === 'kk' ? 'Мамандықтар жүктелуде...' : 'Loading specialties...'}</p>
+      </div>
+    </div>
+  </div>
+</section>

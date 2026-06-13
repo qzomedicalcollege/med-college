@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ContactsContent from '../../components/ContactsContent.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'kk' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title={lang === 'kk' ? 'Байланыс — ҚЖМК' : 'Contacts — KHMC'} lang={lang as any}>
+  <ContactsContent lang={lang} />
+</Layout>

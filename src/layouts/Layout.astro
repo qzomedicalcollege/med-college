@@ -1,0 +1,44 @@
+---
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { ui } from '../i18n/ui';
+import '../../style.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: 'ru' | 'kk' | 'en';
+}
+
+const { title, description = 'Официальный сайт Кызылординского высшего медицинского колледжа', lang = 'ru' } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  
+  <!-- Firebase v8 SDK (Global scripts for client-side use) -->
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script is:inline src="/med-college/firebase-config.js"></script>
+</head>
+<body>
+  
+  <Header lang={lang} />
+  
+  <slot />
+  
+  <Footer lang={lang} />
+
+  <!-- Global scripts client module -->
+  <script src="../scripts/script.js"></script>
+</body>
+</html>

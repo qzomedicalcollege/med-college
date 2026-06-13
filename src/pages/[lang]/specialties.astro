@@ -1,0 +1,17 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SpecsContent from '../../components/SpecsContent.astro';
+
+export function getStaticPaths() {
+  return [
+    { params: { lang: 'kk' } },
+    { params: { lang: 'en' } }
+  ];
+}
+
+const { lang } = Astro.params;
+---
+
+<Layout title={lang === 'kk' ? 'Мамандықтар — ҚЖМК' : 'Specialties — KHMC'} lang={lang as any}>
+  <SpecsContent lang={lang} />
+</Layout>

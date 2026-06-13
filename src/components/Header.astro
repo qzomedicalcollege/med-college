@@ -1,0 +1,173 @@
+---
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { languages } from '../i18n/ui';
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const base = '/med-college';
+
+const pathname = Astro.url.pathname;
+let relativePath = pathname.substring(base.length);
+if (!relativePath.startsWith('/')) {
+  relativePath = '/' + relativePath;
+}
+
+// Extract current path without locale prefix
+const parts = relativePath.split('/');
+let cleanPath = relativePath;
+if (parts[1] === 'kk' || parts[1] === 'en') {
+  cleanPath = '/' + parts.slice(2).join('/');
+}
+
+// Clean up trailing slash
+if (cleanPath.endsWith('/') && cleanPath !== '/') {
+  cleanPath = cleanPath.slice(0, -1);
+}
+
+const getLocalizedUrl = (targetLang: string, page: string) => {
+  const prefix = targetLang === 'ru' ? '' : `/${targetLang}`;
+  const suffix = page === '/' ? '' : page;
+  return `${base}${prefix}${suffix === '' ? '/' : suffix}`;
+};
+
+const getLanguageSwitchUrl = (targetLang: string) => {
+  const prefix = targetLang === 'ru' ? '' : `/${targetLang}`;
+  const suffix = cleanPath === '/' ? '' : cleanPath;
+  return `${base}${prefix}${suffix === '' ? '/' : suffix}`;
+};
+
+const activeTab = cleanPath;
+---
+
+<header>
+  <div class="container nav-bar">
+    <a href={getLocalizedUrl(lang, '/')} class="logo-container">
+      <img src={`${base}/logo.png`} alt="Логотип КВМК" class="logo-img">
+      <div class="logo-text">
+        <h2>КВМК</h2>
+        <p>{lang === 'ru' ? 'Высший Медколледж' : lang === 'kk' ? 'Жоғары Медколледж' : 'Higher Medcollege'}</p>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href={getLocalizedUrl(lang, '/')} class={`nav-item ${activeTab === '/' ? 'active' : ''}`}>{t('nav.home')}</a></li>
+      <li><a href={getLocalizedUrl(lang, '/about')} class={`nav-item ${activeTab === '/about' ? 'active' : ''}`}>{t('nav.about')}</a></li>
+      <li><a href={getLocalizedUrl(lang, '/specialties')} class={`nav-item ${activeTab === '/specialties' ? 'active' : ''}`}>{t('nav.specs')}</a></li>
+      <li><a href={getLocalizedUrl(lang, '/admissions')} class={`nav-item ${activeTab === '/admissions' ? 'active' : ''}`}>{t('nav.admissions')}</a></li>
+      <li><a href={getLocalizedUrl(lang, '/contacts')} class={`nav-item ${activeTab === '/contacts' ? 'active' : ''}`}>{t('nav.contacts')}</a></li>
+    </ul>
+    <div class="nav-actions">
+      <!-- Theme Switch -->
+      <button class="theme-toggle-btn" aria-label={t('nav.theme')}>
+        <i class="fas fa-moon"></i>
+        <i class="fas fa-sun"></i>
+      </button>
+
+      <!-- Language Selector Dropdown -->
+      <div class="lang-selector-container">
+        <button class="lang-selector-btn" aria-label="Select Language">
+          <i class="fas fa-globe"></i>
+          <span>{lang.toUpperCase()}</span>
+          <i class="fas fa-chevron-down" style="font-size: 0.7rem;"></i>
+        </button>
+        <div class="lang-dropdown">
+          {Object.entries(languages).map(([code, name]) => (
+            <a href={getLanguageSwitchUrl(code)} class={lang === code ? 'active' : ''}>
+              {name}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- SmartNation -->
+      <a href="https://college.smartnation.kz/kz/tko" target="_blank" class="btn btn-primary btn-sm smartnation-btn">{t('nav.smartnation')}</a>
+      
+      <!-- Hamburger Menu for mobile -->
+      <div class="hamburger" aria-label="Открыть меню">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- MOBILE NAVIGATION DRAWER -->
+<div class="overlay"></div>
+<div class="mobile-drawer">
+  <!-- Language Selector for Mobile inside Drawer -->
+  <div class="mobile-lang-selector" style="margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); display: flex; gap: 12px; justify-content: center;">
+    {Object.entries(languages).map(([code, name]) => (
+      <a href={getLanguageSwitchUrl(code)} class={`mobile-lang-btn ${lang === code ? 'active' : ''}`} style={`padding: 6px 12px; border-radius: var(--border-radius-sm); font-size: 0.85rem; font-weight: 600; border: 1px solid ${lang === code ? 'var(--color-secondary)' : 'var(--border-color)'}; background: ${lang === code ? 'var(--color-secondary)' : 'none'}; color: ${lang === code ? 'white' : 'var(--text-secondary)'};`}>
+        {code.toUpperCase()}
+      </a>
+    ))}
+  </div>
+
+  <a href={getLocalizedUrl(lang, '/')} class={`nav-item ${activeTab === '/' ? 'active' : ''}`}>{t('nav.home')}</a>
+  <a href={getLocalizedUrl(lang, '/about')} class={`nav-item ${activeTab === '/about' ? 'active' : ''}`}>{t('nav.about')}</a>
+  <a href={getLocalizedUrl(lang, '/specialties')} class={`nav-item ${activeTab === '/specialties' ? 'active' : ''}`}>{t('nav.specs')}</a>
+  <a href={getLocalizedUrl(lang, '/admissions')} class={`nav-item ${activeTab === '/admissions' ? 'active' : ''}`}>{t('nav.admissions')}</a>
+  <a href={getLocalizedUrl(lang, '/contacts')} class={`nav-item ${activeTab === '/contacts' ? 'active' : ''}`}>{t('nav.contacts')}</a>
+  <a href="https://college.smartnation.kz/kz/tko" target="_blank" class="btn btn-primary btn-sm smartnation-btn" style="margin-top: 20px; width: 100%;">{t('nav.smartnation')}</a>
+</div>
+
+<style>
+  /* Premium Language Selector CSS */
+  .lang-selector-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .lang-selector-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    transition: all var(--transition-speed) ease;
+  }
+
+  .lang-selector-btn:hover {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+  }
+
+  .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-lg);
+    display: none;
+    flex-direction: column;
+    min-width: 130px;
+    z-index: 1010;
+    overflow: hidden;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .lang-selector-container:hover .lang-dropdown {
+    display: flex;
+  }
+
+  .lang-dropdown a {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    transition: all var(--transition-speed) ease;
+  }
+
+  .lang-dropdown a:hover, .lang-dropdown a.active {
+    background-color: rgba(var(--color-secondary-rgb), 0.08);
+    color: var(--color-secondary);
+  }
+</style>
