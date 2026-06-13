@@ -826,3 +826,58 @@ window.downloadBase64File = function(base64Data, fileName) {
 // Global functions exposed to window for inline onclicks
 window.formatDate = formatDate;
 window.renderGlobalSettings = renderGlobalSettings;
+
+/* --- UI POLISH: PRELOADER, SCROLL TO TOP, ANIMATIONS --- */
+window.addEventListener('load', () => {
+  const preloader = document.getElementById('preloader');
+  if (preloader) {
+    setTimeout(() => {
+      preloader.classList.add('hidden');
+    }, 300); // 300ms delay to ensure smooth transition
+  }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Scroll to Top functionality
+  const scrollBtn = document.getElementById('scrollToTop');
+  if (scrollBtn) {
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 500) {
+        scrollBtn.classList.add('visible');
+      } else {
+        scrollBtn.classList.remove('visible');
+      }
+    });
+
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+  }
+
+  // Intersection Observer for fade-in elements
+  const observerOptions = {
+    root: null,
+    rootMargin: '0px',
+    threshold: 0.15
+  };
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // Instead of manually adding classes, dynamically add fade-in to major sections
+  const sectionsToAnimate = document.querySelectorAll('.hero-grid, .stats-bar, .section-title, .news-card, .spec-card, .director-card, .feature-box');
+  sectionsToAnimate.forEach(el => {
+    el.classList.add('fade-in');
+    observer.observe(el);
+  });
+});
+

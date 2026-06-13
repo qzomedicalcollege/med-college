@@ -21,6 +21,19 @@ const { title, description = 'Официальный сайт Кызылорди
   <title>{title}</title>
   <meta name="description" content={description}>
   
+  <!-- Open Graph / SEO -->
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={Astro.url.href}>
+  <meta property="og:image" content={new URL('/med-college/logo.png', Astro.url)}>
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={new URL('/med-college/logo.png', Astro.url)}>
+  
   <!-- FontAwesome for Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
@@ -31,12 +44,21 @@ const { title, description = 'Официальный сайт Кызылорди
   <script is:inline src="/med-college/firebase-config.js"></script>
 </head>
 <body>
-  
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="spinner"></div>
+  </div>
+
   <Header lang={lang} />
   
   <slot />
   
   <Footer lang={lang} />
+
+  <!-- Scroll to Top Button -->
+  <button id="scrollToTop" class="scroll-to-top" aria-label="Наверх">
+    <i class="fas fa-arrow-up"></i>
+  </button>
 
   <!-- Global scripts client module -->
   <script src="../scripts/script.js"></script>
