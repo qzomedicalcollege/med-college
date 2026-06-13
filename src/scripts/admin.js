@@ -425,6 +425,7 @@ async function loadNewsData() {
     row.querySelector(`#news-del-${n.id}`).addEventListener('click', () => deleteNews(n.id));
     body.appendChild(row);
   });
+  setupTableSearchAndPagination('admin-news-body', 'search-news', 'pagination-news');
 }
 
 async function loadSpecialtiesData() {
@@ -471,6 +472,7 @@ async function loadSpecialtiesData() {
     row.querySelector(`#spec-del-${s.id}`).addEventListener('click', () => deleteSpec(s.id));
     body.appendChild(row);
   });
+  setupTableSearchAndPagination('admin-specs-body', 'search-specs', 'pagination-specs');
 }
 
 async function loadMessagesData() {
@@ -520,6 +522,7 @@ async function loadMessagesData() {
     row.querySelector(`#msg-del-${m.id}`).addEventListener('click', () => deleteMessage(m.docId));
     body.appendChild(row);
   });
+  setupTableSearchAndPagination('admin-messages-body', 'search-msgs', 'pagination-msgs', 'filter-msgs');
 }
 
 async function loadDocumentsData() {
@@ -564,6 +567,7 @@ async function loadDocumentsData() {
     row.querySelector(`#doc-del-${d.id}`).addEventListener('click', () => deleteDoc(d.docId));
     body.appendChild(row);
   });
+  setupTableSearchAndPagination('admin-docs-body', 'search-docs', 'pagination-docs');
 }
 
 function getCachedDB(key) {
@@ -660,6 +664,76 @@ async function deleteNews(id) {
       alert("Ошибка удаления новости.");
     }
   }
+}
+
+// --- TABLE SEARCH AND PAGINATION ---
+function setupTableSearchAndPagination(tbodyId, searchId, paginationId, filterId = null) {
+  const tbody = document.getElementById(tbodyId);
+  const searchInput = document.getElementById(searchId);
+  const paginationWrapper = document.getElementById(paginationId);
+  const filterSelect = filterId ? document.getElementById(filterId) : null;
+  
+  if (!tbody || !searchInput || !paginationWrapper) return;
+
+  // Clone listeners by replacing elements to avoid multiple listeners if called again
+  const newSearchInput = searchInput.cloneNode(true);
+  searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+  
+  let newFilterSelect = null;
+  if (filterSelect) {
+    newFilterSelect = filterSelect.cloneNode(true);
+    filterSelect.parentNode.replaceChild(newFilterSelect, filterSelect);
+  }
+
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  if (rows.length === 0 || (rows.length === 1 && rows[0].querySelector('td[colspan]'))) {
+    paginationWrapper.innerHTML = '';
+    return;
+  }
+
+  let currentPage = 1;
+  const itemsPerPage = 10;
+
+  function render() {
+    const term = newSearchInput.value.toLowerCase();
+    const filterVal = newFilterSelect ? newFilterSelect.value : 'all';
+
+    let filteredRows = rows.filter(row => {
+      const text = row.innerText.toLowerCase();
+      const matchesSearch = text.includes(term);
+      let matchesFilter = true;
+      if (newFilterSelect && filterVal !== 'all') {
+        const badge = row.querySelector('.badge');
+        if (filterVal === 'unread' && badge && !badge.classList.contains('badge-unread')) matchesFilter = false;
+        if (filterVal === 'read' && badge && badge.classList.contains('badge-unread')) matchesFilter = false;
+      }
+      return matchesSearch && matchesFilter;
+    });
+
+    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+    if (currentPage > totalPages) currentPage = Math.max(1, totalPages);
+
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+
+    rows.forEach(r => r.style.display = 'none');
+    filteredRows.slice(start, end).forEach(r => r.style.display = '');
+
+    paginationWrapper.innerHTML = '';
+    if (totalPages > 1) {
+      for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.className = `admin-pagination-btn ${i === currentPage ? 'active' : ''}`;
+        btn.textContent = i;
+        btn.onclick = () => { currentPage = i; render(); };
+        paginationWrapper.appendChild(btn);
+      }
+    }
+  }
+
+  newSearchInput.addEventListener('input', () => { currentPage = 1; render(); });
+  if (newFilterSelect) newFilterSelect.addEventListener('change', () => { currentPage = 1; render(); });
+  render();
 }
 
 window.openAddSpecModal = function() {

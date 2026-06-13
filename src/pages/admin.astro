@@ -13,10 +13,10 @@ const base = '/med-college';
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <!-- Firebase v8 SDK (Global scripts for client-side use) -->
-  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script is:inline src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script is:inline src="/med-college/firebase-config.js"></script>
+  <script is:inline defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script is:inline defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script is:inline defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script is:inline defer src="/med-college/firebase-config.js"></script>
 </head>
 <body>
 
@@ -176,6 +176,9 @@ const base = '/med-college';
           <button class="btn btn-primary btn-sm" onclick="openAddNewsModal()"><i class="fas fa-plus"></i> Добавить новость</button>
         </div>
         <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-controls" style="display: flex; gap: 15px; margin-bottom: 16px;">
+            <input type="text" id="search-news" class="form-control" placeholder="Поиск новостей..." style="max-width: 300px;">
+          </div>
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -192,6 +195,7 @@ const base = '/med-college';
               </tbody>
             </table>
           </div>
+          <div id="pagination-news" class="admin-pagination"></div>
         </div>
       </div>
 
@@ -202,6 +206,9 @@ const base = '/med-college';
           <button class="btn btn-primary btn-sm" onclick="openAddSpecModal()"><i class="fas fa-plus"></i> Добавить специальность</button>
         </div>
         <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-controls" style="display: flex; gap: 15px; margin-bottom: 16px;">
+            <input type="text" id="search-specs" class="form-control" placeholder="Поиск специальностей..." style="max-width: 300px;">
+          </div>
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -218,6 +225,7 @@ const base = '/med-college';
               </tbody>
             </table>
           </div>
+          <div id="pagination-specs" class="admin-pagination"></div>
         </div>
       </div>
 
@@ -225,6 +233,14 @@ const base = '/med-college';
       <div class="admin-tab-content" id="tab-messages" style="display: none;">
         <h3 style="color: var(--color-primary); margin-bottom: 24px;">Входящие обращения</h3>
         <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-controls" style="display: flex; gap: 15px; margin-bottom: 16px;">
+            <input type="text" id="search-msgs" class="form-control" placeholder="Поиск по имени или теме..." style="max-width: 300px;">
+            <select id="filter-msgs" class="form-control" style="max-width: 150px;">
+              <option value="all">Все статусы</option>
+              <option value="unread">Новые</option>
+              <option value="read">Прочитанные</option>
+            </select>
+          </div>
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -243,6 +259,7 @@ const base = '/med-college';
               </tbody>
             </table>
           </div>
+          <div id="pagination-msgs" class="admin-pagination"></div>
         </div>
       </div>
 
@@ -253,6 +270,9 @@ const base = '/med-college';
           <button class="btn btn-primary btn-sm" onclick="openAddDocModal()"><i class="fas fa-plus"></i> Добавить документ</button>
         </div>
         <div class="glass-card" style="padding: 24px;">
+          <div class="admin-table-controls" style="display: flex; gap: 15px; margin-bottom: 16px;">
+            <input type="text" id="search-docs" class="form-control" placeholder="Поиск документов..." style="max-width: 300px;">
+          </div>
           <div class="admin-table-container">
             <table class="admin-table">
               <thead>
@@ -269,6 +289,7 @@ const base = '/med-college';
               </tbody>
             </table>
           </div>
+          <div id="pagination-docs" class="admin-pagination"></div>
         </div>
       </div>
 

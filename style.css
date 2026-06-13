@@ -1717,6 +1717,37 @@ footer {
   transform: translateY(-5px);
 }
 
+/* --- ADMIN PAGINATION --- */
+.admin-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+.admin-pagination-btn {
+  padding: 6px 12px;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.admin-pagination-btn:hover {
+  background-color: var(--color-primary);
+  color: white;
+}
+.admin-pagination-btn.active {
+  background-color: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+.admin-pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .fade-in {
   opacity: 0;
   transform: translateY(30px);

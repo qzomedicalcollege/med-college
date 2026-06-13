@@ -414,7 +414,7 @@ function renderHomePage() {
       let imageMarkup = '';
       const newsTitle = getLangText(item, 'title');
       if (item.image && item.image.startsWith('data:image')) {
-        imageMarkup = `<img src="${item.image}" alt="${newsTitle}" style="width:100%; height:100%; object-fit:cover;">`;
+        imageMarkup = `<img src="${item.image}" alt="${newsTitle}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">`;
       } else {
         let svgMarkup = '';
         if (item.category === 'Образование') {
