@@ -200,88 +200,37 @@ const defaultSpecialties = [
 ];
 
 // --- 2. FIRESTORE SYNC & INITIALIZATION LOGIC ---
-async function syncAndLoadDB() {
-  const isDbAvailable = typeof db !== 'undefined';
-  if (!isDbAvailable) {
-    console.warn("Firebase global db is not available. Running from local defaults.");
+
+// Helper: wrap a promise with a timeout (returns null on timeout)
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise(function(resolve) { setTimeout(function() { resolve(null); }, ms); })
+  ]);
+}
+
+// Step 1: Immediately render the page with defaults (no waiting for Firebase)
+function renderPageNow() {
+  // Save defaults to localStorage so renderers can read them
+  if (!localStorage.getItem("college_settings")) {
+    localStorage.setItem("college_settings", JSON.stringify(defaultSettings));
+  }
+  if (!localStorage.getItem("college_specialties")) {
+    localStorage.setItem("college_specialties", JSON.stringify(defaultSpecialties));
+  }
+  if (!localStorage.getItem("college_news")) {
+    localStorage.setItem("college_news", JSON.stringify(defaultNews));
+  }
+  if (!localStorage.getItem("college_documents")) {
+    localStorage.setItem("college_documents", JSON.stringify([]));
   }
 
-  // 1. Settings Synchronization
-  let settingsData = defaultSettings;
-  if (isDbAvailable) {
-    try {
-      const settingsDocRef = db.collection("settings").doc("general");
-      const settingsSnap = await settingsDocRef.get();
-      if (!settingsSnap.exists) {
-        await settingsDocRef.set(defaultSettings);
-      } else {
-        settingsData = settingsSnap.data();
-      }
-    } catch (error) {
-      console.warn("Failed to sync settings with Firebase:", error);
-    }
-  }
-  localStorage.setItem("college_settings", JSON.stringify(settingsData));
-
-  // 2. Specialties Synchronization
-  let specsList = defaultSpecialties;
-  if (isDbAvailable) {
-    try {
-      const specsSnap = await db.collection("specialties").get();
-      if (specsSnap.empty || specsSnap.size < 7) {
-        // Only write defaults if they have permissions
-        for (const spec of defaultSpecialties) {
-          await db.collection("specialties").doc(String(spec.id)).set(spec);
-        }
-      } else {
-        specsList = [];
-        specsSnap.forEach(doc => specsList.push(doc.data()));
-      }
-    } catch (error) {
-      console.warn("Failed to sync specialties with Firebase, using defaults:", error);
-    }
-  }
-  localStorage.setItem("college_specialties", JSON.stringify(specsList));
-
-  // 3. News Synchronization
-  let newsList = defaultNews;
-  if (isDbAvailable) {
-    try {
-      const newsSnap = await db.collection("news").get();
-      if (newsSnap.empty) {
-        for (const n of defaultNews) {
-          await db.collection("news").doc(String(n.id)).set(n);
-        }
-      } else {
-        newsList = [];
-        newsSnap.forEach(doc => newsList.push(doc.data()));
-      }
-    } catch (error) {
-      console.warn("Failed to sync news with Firebase, using defaults:", error);
-    }
-  }
-  localStorage.setItem("college_news", JSON.stringify(newsList));
-
-  // 4. Documents Synchronization
-  let docsList = [];
-  if (isDbAvailable) {
-    try {
-      const docsSnap = await db.collection("documents").get();
-      if (!docsSnap.empty) {
-        docsSnap.forEach(doc => docsList.push(doc.data()));
-      }
-    } catch (error) {
-      console.warn("Failed to sync documents:", error);
-    }
-  }
-  localStorage.setItem("college_documents", JSON.stringify(docsList));
-
-  // Render Page Content
+  // Render global settings (footer contacts etc.)
   renderGlobalSettings();
 
-  // Run Page-Specific Renderers based on clean Astro paths
-  const path = window.location.pathname.toLowerCase();
-  let cleanPath = path;
+  // Run page-specific renderers based on current URL
+  var path = window.location.pathname.toLowerCase();
+  var cleanPath = path;
   if (cleanPath.startsWith('/med-college')) {
     cleanPath = cleanPath.substring('/med-college'.length);
   }
@@ -303,15 +252,72 @@ async function syncAndLoadDB() {
   } else if (cleanPath === '/contacts' || cleanPath === '/contacts.html') {
     initContactsPage();
   }
+  console.log("Page rendered with local data.");
 }
 
-// Check if Firebase is loaded before syncing
-function initApp() {
-  if (typeof db !== 'undefined') {
-    syncAndLoadDB();
-  } else {
-    setTimeout(syncAndLoadDB, 500); // safety fallback delay
+// Step 2: Try to sync with Firebase in background (non-blocking, with timeout)
+async function syncFirebaseInBackground() {
+  if (typeof db === 'undefined') {
+    console.warn("Firebase db not available, skipping background sync.");
+    return;
   }
+
+  var dataChanged = false;
+
+  // Settings sync (3 second timeout)
+  try {
+    var settingsSnap = await withTimeout(db.collection("settings").doc("general").get(), 3000);
+    if (settingsSnap && settingsSnap.exists) {
+      localStorage.setItem("college_settings", JSON.stringify(settingsSnap.data()));
+      dataChanged = true;
+    }
+  } catch (e) { console.warn("Firebase settings sync failed:", e); }
+
+  // Specialties sync (3 second timeout)
+  try {
+    var specsSnap = await withTimeout(db.collection("specialties").get(), 3000);
+    if (specsSnap && !specsSnap.empty && specsSnap.size >= 7) {
+      var specsList = [];
+      specsSnap.forEach(function(doc) { specsList.push(doc.data()); });
+      localStorage.setItem("college_specialties", JSON.stringify(specsList));
+      dataChanged = true;
+    }
+  } catch (e) { console.warn("Firebase specialties sync failed:", e); }
+
+  // News sync (3 second timeout)
+  try {
+    var newsSnap = await withTimeout(db.collection("news").get(), 3000);
+    if (newsSnap && !newsSnap.empty) {
+      var newsList = [];
+      newsSnap.forEach(function(doc) { newsList.push(doc.data()); });
+      localStorage.setItem("college_news", JSON.stringify(newsList));
+      dataChanged = true;
+    }
+  } catch (e) { console.warn("Firebase news sync failed:", e); }
+
+  // Documents sync (3 second timeout)
+  try {
+    var docsSnap = await withTimeout(db.collection("documents").get(), 3000);
+    if (docsSnap && !docsSnap.empty) {
+      var docsList = [];
+      docsSnap.forEach(function(doc) { docsList.push(doc.data()); });
+      localStorage.setItem("college_documents", JSON.stringify(docsList));
+      dataChanged = true;
+    }
+  } catch (e) { console.warn("Firebase documents sync failed:", e); }
+
+  // If anything changed from Firebase, re-render the page
+  if (dataChanged) {
+    console.log("Firebase data received, re-rendering page.");
+    renderPageNow();
+  }
+}
+
+// Main initialization: render immediately, then sync Firebase
+function initApp() {
+  renderPageNow();
+  // Fire-and-forget: try Firebase in background
+  setTimeout(syncFirebaseInBackground, 100);
 }
 
 if (document.readyState === 'loading') {
