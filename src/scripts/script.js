@@ -201,74 +201,78 @@ const defaultSpecialties = [
 
 // --- 2. FIRESTORE SYNC & INITIALIZATION LOGIC ---
 async function syncAndLoadDB() {
-  if (typeof db === 'undefined') {
-    console.warn("Firebase global db is not initialized yet. Waiting...");
-    return;
+  const isDbAvailable = typeof db !== 'undefined';
+  if (!isDbAvailable) {
+    console.warn("Firebase global db is not available. Running from local defaults.");
   }
 
   // 1. Settings Synchronization
   let settingsData = defaultSettings;
-  try {
-    const settingsDocRef = db.collection("settings").doc("general");
-    const settingsSnap = await settingsDocRef.get();
-    if (!settingsSnap.exists) {
-      await settingsDocRef.set(defaultSettings);
-      console.log("Firestore settings initialized with defaults.");
-    } else {
-      settingsData = settingsSnap.data();
+  if (isDbAvailable) {
+    try {
+      const settingsDocRef = db.collection("settings").doc("general");
+      const settingsSnap = await settingsDocRef.get();
+      if (!settingsSnap.exists) {
+        await settingsDocRef.set(defaultSettings);
+      } else {
+        settingsData = settingsSnap.data();
+      }
+    } catch (error) {
+      console.warn("Failed to sync settings with Firebase:", error);
     }
-  } catch (error) {
-    console.warn("Failed to sync settings with Firebase:", error);
   }
   localStorage.setItem("college_settings", JSON.stringify(settingsData));
 
   // 2. Specialties Synchronization
   let specsList = defaultSpecialties;
-  try {
-    const specsSnap = await db.collection("specialties").get();
-    if (specsSnap.empty || specsSnap.size < 7) {
-      for (const spec of defaultSpecialties) {
-        await db.collection("specialties").doc(String(spec.id)).set(spec);
+  if (isDbAvailable) {
+    try {
+      const specsSnap = await db.collection("specialties").get();
+      if (specsSnap.empty || specsSnap.size < 7) {
+        // Only write defaults if they have permissions
+        for (const spec of defaultSpecialties) {
+          await db.collection("specialties").doc(String(spec.id)).set(spec);
+        }
+      } else {
+        specsList = [];
+        specsSnap.forEach(doc => specsList.push(doc.data()));
       }
-      console.log("Firestore specialties initialized with defaults.");
-    } else {
-      specsList = [];
-      specsSnap.forEach(doc => specsList.push(doc.data()));
+    } catch (error) {
+      console.warn("Failed to sync specialties with Firebase, using defaults:", error);
     }
-  } catch (error) {
-    console.warn("Failed to sync specialties with Firebase, using defaults:", error);
-    specsList = defaultSpecialties;
   }
   localStorage.setItem("college_specialties", JSON.stringify(specsList));
 
   // 3. News Synchronization
   let newsList = defaultNews;
-  try {
-    const newsSnap = await db.collection("news").get();
-    if (newsSnap.empty) {
-      for (const n of defaultNews) {
-        await db.collection("news").doc(String(n.id)).set(n);
+  if (isDbAvailable) {
+    try {
+      const newsSnap = await db.collection("news").get();
+      if (newsSnap.empty) {
+        for (const n of defaultNews) {
+          await db.collection("news").doc(String(n.id)).set(n);
+        }
+      } else {
+        newsList = [];
+        newsSnap.forEach(doc => newsList.push(doc.data()));
       }
-      console.log("Firestore news initialized with defaults.");
-    } else {
-      newsList = [];
-      newsSnap.forEach(doc => newsList.push(doc.data()));
+    } catch (error) {
+      console.warn("Failed to sync news with Firebase, using defaults:", error);
     }
-  } catch (error) {
-    console.warn("Failed to sync news with Firebase, using defaults:", error);
-    newsList = defaultNews;
   }
   localStorage.setItem("college_news", JSON.stringify(newsList));
 
   // 4. Documents Synchronization
   let docsList = [];
-  try {
-    const docsSnap = await db.collection("documents").get();
-    if (!docsSnap.empty) {
-      docsSnap.forEach(doc => docsList.push(doc.data()));
+  if (isDbAvailable) {
+    try {
+      const docsSnap = await db.collection("documents").get();
+      if (!docsSnap.empty) {
+        docsSnap.forEach(doc => docsList.push(doc.data()));
+      }
+    } catch (error) {
+      console.warn("Failed to sync documents:", error);
     }
-  } catch (error) {
-    console.warn("Failed to sync documents:", error);
   }
   localStorage.setItem("college_documents", JSON.stringify(docsList));
 
