@@ -306,12 +306,18 @@ async function syncAndLoadDB() {
 }
 
 // Check if Firebase is loaded before syncing
-if (typeof db !== 'undefined') {
-  syncAndLoadDB();
-} else {
-  document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
+  if (typeof db !== 'undefined') {
+    syncAndLoadDB();
+  } else {
     setTimeout(syncAndLoadDB, 500); // safety fallback delay
-  });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
 
 function getCachedDB(key) {
