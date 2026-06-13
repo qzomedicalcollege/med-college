@@ -206,62 +206,71 @@ async function syncAndLoadDB() {
     return;
   }
 
+  // 1. Settings Synchronization
+  let settingsData = defaultSettings;
   try {
-    // 1. Settings Synchronization
     const settingsDocRef = db.collection("settings").doc("general");
     const settingsSnap = await settingsDocRef.get();
-    let settingsData;
-
     if (!settingsSnap.exists) {
       await settingsDocRef.set(defaultSettings);
-      settingsData = defaultSettings;
       console.log("Firestore settings initialized with defaults.");
     } else {
       settingsData = settingsSnap.data();
     }
-    localStorage.setItem("college_settings", JSON.stringify(settingsData));
+  } catch (error) {
+    console.warn("Failed to sync settings with Firebase:", error);
+  }
+  localStorage.setItem("college_settings", JSON.stringify(settingsData));
 
-    // 2. Specialties Synchronization
+  // 2. Specialties Synchronization
+  let specsList = defaultSpecialties;
+  try {
     const specsSnap = await db.collection("specialties").get();
-    let specsList = [];
-
     if (specsSnap.empty || specsSnap.size < 7) {
       for (const spec of defaultSpecialties) {
         await db.collection("specialties").doc(String(spec.id)).set(spec);
       }
-      specsList = defaultSpecialties;
       console.log("Firestore specialties initialized with defaults.");
     } else {
+      specsList = [];
       specsSnap.forEach(doc => specsList.push(doc.data()));
     }
-    localStorage.setItem("college_specialties", JSON.stringify(specsList));
+  } catch (error) {
+    console.warn("Failed to sync specialties with Firebase, using defaults:", error);
+    specsList = defaultSpecialties;
+  }
+  localStorage.setItem("college_specialties", JSON.stringify(specsList));
 
-    // 3. News Synchronization
+  // 3. News Synchronization
+  let newsList = defaultNews;
+  try {
     const newsSnap = await db.collection("news").get();
-    let newsList = [];
-
     if (newsSnap.empty) {
       for (const n of defaultNews) {
         await db.collection("news").doc(String(n.id)).set(n);
       }
-      newsList = defaultNews;
       console.log("Firestore news initialized with defaults.");
     } else {
+      newsList = [];
       newsSnap.forEach(doc => newsList.push(doc.data()));
     }
-    localStorage.setItem("college_news", JSON.stringify(newsList));
+  } catch (error) {
+    console.warn("Failed to sync news with Firebase, using defaults:", error);
+    newsList = defaultNews;
+  }
+  localStorage.setItem("college_news", JSON.stringify(newsList));
 
-    // 4. Documents Synchronization
+  // 4. Documents Synchronization
+  let docsList = [];
+  try {
     const docsSnap = await db.collection("documents").get();
-    let docsList = [];
     if (!docsSnap.empty) {
       docsSnap.forEach(doc => docsList.push(doc.data()));
     }
-    localStorage.setItem("college_documents", JSON.stringify(docsList));
-
   } catch (error) {
-    console.warn("Failed to sync with Firebase. Running from localStorage cache.", error);
+    console.warn("Failed to sync documents:", error);
   }
+  localStorage.setItem("college_documents", JSON.stringify(docsList));
 
   // Render Page Content
   renderGlobalSettings();
