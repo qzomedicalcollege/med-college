@@ -211,16 +211,10 @@ function withTimeout(promise, ms) {
 
 // Step 1: Immediately render the page with defaults (no waiting for Firebase)
 function renderPageNow() {
-  // Save defaults to localStorage so renderers can read them
-  if (!localStorage.getItem("college_settings")) {
-    localStorage.setItem("college_settings", JSON.stringify(defaultSettings));
-  }
-  if (!localStorage.getItem("college_specialties")) {
-    localStorage.setItem("college_specialties", JSON.stringify(defaultSpecialties));
-  }
-  if (!localStorage.getItem("college_news")) {
-    localStorage.setItem("college_news", JSON.stringify(defaultNews));
-  }
+  // Always write fresh defaults to localStorage (overwrites stale/broken data)
+  localStorage.setItem("college_settings", JSON.stringify(defaultSettings));
+  localStorage.setItem("college_specialties", JSON.stringify(defaultSpecialties));
+  localStorage.setItem("college_news", JSON.stringify(defaultNews));
   if (!localStorage.getItem("college_documents")) {
     localStorage.setItem("college_documents", JSON.stringify([]));
   }
