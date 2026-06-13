@@ -309,15 +309,23 @@ async function syncFirebaseInBackground() {
 
 // Main initialization: render immediately, then sync Firebase
 function initApp() {
-  renderPageNow();
-  // Fire-and-forget: try Firebase in background
-  setTimeout(syncFirebaseInBackground, 100);
+  try {
+    console.log("[KVMK] initApp started, readyState:", document.readyState);
+    renderPageNow();
+    console.log("[KVMK] renderPageNow completed successfully");
+    // Fire-and-forget: try Firebase in background
+    setTimeout(syncFirebaseInBackground, 100);
+  } catch (err) {
+    console.error("[KVMK] ERROR in initApp:", err);
+  }
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
+// With defer, script runs after HTML parsing is complete, so DOM is ready
+// Call initApp immediately - no need to wait for DOMContentLoaded
+try {
   initApp();
+} catch (err) {
+  console.error("[KVMK] CRITICAL ERROR:", err);
 }
 
 function getCachedDB(key) {
